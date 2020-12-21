@@ -28,9 +28,9 @@ class RestController {
 //        user.setFirstName("john")
 //        user.setLastName("adward")
 
-        var body = httpEntity.body
+        val body = httpEntity.body
 
-        return wsdlService.wsdlToTemplate(body)
+        return wsdlService.wsdlToTemplate(body.toString())
     }
 
 }
