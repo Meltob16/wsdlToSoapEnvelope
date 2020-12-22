@@ -2,10 +2,13 @@ package com.santaSinChristmasSoap.wsdlToTemplate.service
 
 import org.springframework.stereotype.Service
 
+
 @Service
 class WsdlService {
+
     fun wsdlToTemplate(wsdl: String): String? {
         var wsdl = removeIrrelevantInformation(wsdl)
+        createListContainingAllEndpoints(wsdl)
 
         return wsdl
     }
@@ -37,6 +40,36 @@ class WsdlService {
 
         return tempWsdl
     }
+
+    fun createListContainingAllEndpoints(wsdl: String): List<String> { // removes operation tags
+        var tempWsdl = wsdl
+        val endpoints = mutableListOf<String>()
+
+        while (tempWsdl.contains("<wsdl:operation name=\"")) {
+            var startIndex = tempWsdl.indexOf("<wsdl:operation name=\"") + 22
+            var i = ""
+            var lastIndexOfName = startIndex
+            while (i != "\"") {
+                lastIndexOfName + 1
+                i = tempWsdl[lastIndexOfName].toString()
+            }
+            val name = tempWsdl.substring(startIndex, lastIndexOfName)
+            endpoints.add(name)
+
+
+            var tagEnding = tempWsdl.indexOf("<wsdl:operation/>") + 17
+            val startWsdl = tempWsdl.substring(0, startIndex - 22)
+            val endWsdl = tempWsdl.substring(tagEnding, tempWsdl.length)
+            tempWsdl = startWsdl + endWsdl
+        }
+        endpoints.forEach(System.out::print)
+        return endpoints
+    }
+
+    fun extractSpecifiedEndpoint(wsdl: String): String {
+        return wsdl
+    }
+
 
 //    fun createHeader(): String {
 //
