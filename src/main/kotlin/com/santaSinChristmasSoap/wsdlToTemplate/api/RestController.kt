@@ -14,22 +14,16 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("wsdlToTemplate")
-class RestController {
+class RestController(
+        @Autowired
+        val wsdlService: WsdlService
+) {
 
-    @Autowired
-    val wsdlService = WsdlService()
 
     @RequestMapping(method = [RequestMethod.GET], headers = ["Accept=*/*"])
     @ResponseBody
     fun getWsdl(httpEntity: HttpEntity<String>): String? {
-
-
-//        val user = User()
-//        user.setFirstName("john")
-//        user.setLastName("adward")
-
         val body = httpEntity.body
-
         return wsdlService.wsdlToTemplate(body.toString())
     }
 

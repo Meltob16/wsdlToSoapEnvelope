@@ -20,7 +20,21 @@ class WsdlService {
             val startWsdl = tempWsdl.substring(0, first)
             val endWsdl = tempWsdl.substring(ending + 16, tempWsdl.length)
             tempWsdl = startWsdl + endWsdl
+        }                                                                       //TODO look into regexing these loops
+
+        while (tempWsdl.contains("<xsd:annotation>")) {
+            var first = tempWsdl.indexOf("<xsd:annotation>")
+            var ending = tempWsdl.indexOf("</xsd:annotation>",
+                    first)
+            val startWsdl = tempWsdl.substring(0, first)
+            val endWsdl = tempWsdl.substring(ending + 17, tempWsdl.length)
+            tempWsdl = startWsdl + endWsdl
         }
+
+
+        tempWsdl = tempWsdl.replace("<xsd:annotation/>", "")
+        tempWsdl = tempWsdl.replace("<xs:annotation/>", "")
+
         return tempWsdl
     }
 
