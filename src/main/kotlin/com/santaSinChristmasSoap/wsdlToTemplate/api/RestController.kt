@@ -24,6 +24,7 @@ class RestController(
     @ResponseBody
     fun getWsdl(httpEntity: HttpEntity<String>): String? {
         val body = httpEntity.body
+
         return wsdlService.wsdlToTemplate(body.toString())
     }
 
