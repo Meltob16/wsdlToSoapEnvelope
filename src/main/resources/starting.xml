@@ -1,0 +1,1378 @@
+This XML file does not appear to have any style information associated with it. The document tree is shown below.
+
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="urn:fnd.payment.fs.evry.com:ws:fnd-ledger-sync-ws-types:v1_0" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:sch5="urn:fnd.payment.fs.evry.com:domain:fnd-ledger-sync:v1_0" xmlns:sch4="urn:fnd.payment.fs.evry.com:domain:fnd-ledger-sync-iso:v1_0" xmlns:sch3="urn:fnd.payment.fs.evry.com:domain:fnd-common:v1_0" xmlns:sch2="urn:fnd.payment.fs.evry.com:domain:fnd-common-iso:v1_0" xmlns:sch1="http://edb.com/ws/WSCommon_v22" xmlns:sch0="urn:fnd.payment.fs.evry.com:ws:fnd-ledger-sync-ws-types:v1_0" targetNamespace="urn:fnd.payment.fs.evry.com:ws:fnd-ledger-sync-ws-types:v1_0">
+    <wsdl:types>
+        <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="urn:fnd.payment.fs.evry.com:ws:fnd-ledger-sync-ws-types:v1_0" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:sch5="urn:fnd.payment.fs.evry.com:domain:fnd-ledger-sync:v1_0" xmlns:sch4="urn:fnd.payment.fs.evry.com:domain:fnd-ledger-sync-iso:v1_0" xmlns:sch3="urn:fnd.payment.fs.evry.com:domain:fnd-common:v1_0" xmlns:sch2="urn:fnd.payment.fs.evry.com:domain:fnd-common-iso:v1_0" xmlns:sch1="http://edb.com/ws/WSCommon_v22" xmlns:sch0="urn:fnd.payment.fs.evry.com:ws:fnd-ledger-sync-ws-types:v1_0" xmlns:ledgersync="urn:fnd.payment.fs.evry.com:domain:fnd-ledger-sync:v1_0" xmlns:iso="urn:fnd.payment.fs.evry.com:domain:fnd-common-iso:v1_0" xmlns:common="urn:fnd.payment.fs.evry.com:domain:fnd-common:v1_0" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="urn:fnd.payment.fs.evry.com:ws:fnd-ledger-sync-ws-types:v1_0">
+            <xs:annotation>
+                <xs:documentation> Ledger specific operations for FC systems. Response status codes: 0 = OK 6034 = Account does not exist 6042 = Confirmation not found for the account. 6047 = Confirmation does not exist 6049 = Ledger {0} not found 6050 = Ledger already exists 6051 = Ledger description missing 6052 = Either ledger date or ledger sync id or both are missing in the input with ledger {0} 6059 = Description is missing 6062 = Send to Rule Machine failed for {0}transaction 6070 = No ledger found 6083 = Ledger Sync is not completed. Hence Ledger period cannot be updated for ledger {0} 6084 = New ledger period is less than or equal to the current period {0} for the ledger {1} </xs:documentation>
+            </xs:annotation>
+            <xs:import namespace="urn:fnd.payment.fs.evry.com:domain:fnd-ledger-sync:v1_0"/>
+            <xs:import namespace="urn:fnd.payment.fs.evry.com:domain:fnd-common:v1_0"/>
+            <xs:import namespace="urn:fnd.payment.fs.evry.com:domain:fnd-common-iso:v1_0"/>
+            <xs:element name="ledgerConfirmationRequest" type="tns:ledgerConfirmationRequest">
+                <xs:annotation>
+                    <xs:documentation>Used by Ledger to adjust the balances in FC on internal ledger bookings. These internally posted transactions in ledger will not have a corresponding reservation or a confirmation in FC.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="ledgerConfirmationResponse">
+                <xs:complexType>
+                    <xs:complexContent>
+                        <xs:extension base="tns:ledgerSyncResponse">
+                            <xs:sequence>
+                                <xs:element minOccurs="0" name="ConfResp">
+                                    <xs:complexType>
+                                        <xs:sequence>
+                                            <xs:element name="BlncDtls" type="common:TransactionBalanceDetailsV01"/>
+                                            <xs:element name="ConfId" type="iso:ReservationOrConfirmationId">
+                                                <xs:annotation>
+                                                    <xs:documentation>Confirmation Id</xs:documentation>
+                                                </xs:annotation>
+                                            </xs:element>
+                                        </xs:sequence>
+                                    </xs:complexType>
+                                </xs:element>
+                            </xs:sequence>
+                        </xs:extension>
+                    </xs:complexContent>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="ledgerConfirmationFault" type="common:responseStateCodedFault"/>
+            <xs:element name="deleteConfirmationPostedInLedgerRequest" type="tns:deleteConfirmationPostedinLedger">
+                <xs:annotation>
+                    <xs:documentation>Used by Ledger to delete a confirmation in FC that is booked in ledger (intra day).</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="deleteConfirmationPostedInLedgerResponse" type="tns:ledgerSyncResponse"/>
+            <xs:element name="deleteConfirmationPostedInLedgerFault" type="common:responseStateCodedFault"/>
+            <xs:element name="createLedgerPeriodRequest" type="tns:createLedgerPeriodRequest">
+                <xs:annotation>
+                    <xs:documentation>Used to start a new ledger sync cycle in FC. The Ledger Sync Id tells FC which confirmations to remove during a ledger sync execute.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="createLedgerPeriodResponse" type="tns:ledgerSyncResponse"/>
+            <xs:element name="createLedgerPeriodFault" type="common:responseStateCodedFault"/>
+            <xs:element name="newLedgerPeriodRequest" type="tns:newLedgerPeriodRequest">
+                <xs:annotation>
+                    <xs:documentation>Used to start a new ledger sync cycle in FC. The Ledger Sync Id tells FC which confirmations to remove during a ledger sync execute.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="newLedgerPeriodResponse" type="tns:ledgerSyncResponse"/>
+            <xs:element name="newLedgerPeriodFault" type="common:responseStateCodedFault"/>
+            <xs:element name="balanceSynchronizationFromLedgerRequest" type="tns:balanceSynchronizationFromLedgerRequest">
+                <xs:annotation>
+                    <xs:documentation>Used by Ledger to sync account balances after End-Of-Day processing in ledger.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="balanceSynchronizationFromLedgerResponse" type="tns:ledgerSyncResponse"/>
+            <xs:element name="balanceSynchronizationFromLedgerFault" type="common:responseStateCodedFault"/>
+            <xs:element name="listLedgerInformationRequest" type="tns:listLedgerInformationRequest">
+                <xs:annotation>
+                    <xs:documentation>Used to list Ledgers defined in FC.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="listLedgerInformationResponse" type="tns:listLedgerInformationResponse"/>
+            <xs:element name="listLedgerInformationFault" type="common:responseStateCodedFault"/>
+            <xs:complexType name="ledgerConfirmationRequest">
+                <xs:sequence>
+                    <xs:element name="GrpHdr" type="common:GroupHeaderV01">
+                        <xs:annotation>
+                            <xs:documentation>Group of information that provides correct processing of an online transaction.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="LdgBlnc" type="ledgersync:BookedConfirmationType">
+                        <xs:annotation>
+                            <xs:documentation>Group of information for a confirmation</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="deleteConfirmationPostedinLedger">
+                <xs:sequence>
+                    <xs:element name="GrpHdr" type="common:GroupHeaderV01">
+                        <xs:annotation>
+                            <xs:documentation>Group of information that provides a correct processing of an online transaction.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="LdgConf" type="ledgersync:DeleteConfirmationPostedInLedgerType">
+                        <xs:annotation>
+                            <xs:documentation>Group of information to delete a confirmation in FC when it is posted in Ledger</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="createLedgerPeriodRequest">
+                <xs:sequence>
+                    <xs:element name="GrpHdr" type="common:GroupHeaderV01">
+                        <xs:annotation>
+                            <xs:documentation>Group of information that provides correct processing of an online transaction.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="LdgInf" type="iso:LedgerInfoV01">
+                        <xs:annotation>
+                            <xs:documentation>Ledger information</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="newLedgerPeriodRequest">
+                <xs:sequence>
+                    <xs:element name="GrpHdr" type="common:GroupHeaderV01">
+                        <xs:annotation>
+                            <xs:documentation>Group of information that provides correct processing of an online transaction.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="LdgInf" type="iso:LedgerInfoV01">
+                        <xs:annotation>
+                            <xs:documentation>Ledger information</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="listLedgerInformationRequest">
+                <xs:sequence>
+                    <xs:element name="GrpHdr" type="common:GroupHeaderV01">
+                        <xs:annotation>
+                            <xs:documentation>Group of information that provides correct processing of an online transaction.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="listLedgerInformationResponse">
+                <xs:complexContent>
+                    <xs:extension base="common:baseResponseType">
+                        <xs:sequence>
+                            <xs:element maxOccurs="unbounded" minOccurs="0" name="LdgInfos" type="ledgersync:ListLedgerResponseType">
+                                <xs:annotation>
+                                    <xs:documentation>Ledgers Information</xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:extension>
+                </xs:complexContent>
+            </xs:complexType>
+            <xs:complexType name="balanceSynchronizationFromLedgerRequest">
+                <xs:sequence>
+                    <xs:element name="GrpHdr" type="common:GroupHeaderV01">
+                        <xs:annotation>
+                            <xs:documentation>Group of information that provides correct processing of an online transaction.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="LdgSync" type="ledgersync:LedgerSyncType">
+                        <xs:annotation>
+                            <xs:documentation>Ledger Sync information</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="LdgBal" type="common:AmountDetailsV01">
+                        <xs:annotation>
+                            <xs:documentation>Ledger balance</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="ledgerSyncResponse">
+                <xs:complexContent>
+                    <xs:extension base="common:baseResponseType"/>
+                </xs:complexContent>
+            </xs:complexType>
+        </xs:schema>
+        <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="urn:fnd.payment.fs.evry.com:ws:fnd-ledger-sync-ws-types:v1_0" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:sch5="urn:fnd.payment.fs.evry.com:domain:fnd-ledger-sync:v1_0" xmlns:sch4="urn:fnd.payment.fs.evry.com:domain:fnd-ledger-sync-iso:v1_0" xmlns:sch3="urn:fnd.payment.fs.evry.com:domain:fnd-common:v1_0" xmlns:sch2="urn:fnd.payment.fs.evry.com:domain:fnd-common-iso:v1_0" xmlns:sch1="http://edb.com/ws/WSCommon_v22" xmlns:sch0="urn:fnd.payment.fs.evry.com:ws:fnd-ledger-sync-ws-types:v1_0" xmlns="http://edb.com/ws/WSCommon_v22" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://edb.com/ws/WSCommon_v22">
+            <xsd:complexType name="ClientContextType">
+                <xsd:sequence>
+                    <xsd:element name="userid" type="xsd:string">
+                        <xsd:annotation>
+                            <xsd:documentation>Identifies the person who initiated the action This could either be the customer itself in a netbank) or an employee</xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element name="credentials" type="xsd:string">
+                        <xsd:annotation>
+                            <xsd:documentation>Authorization data. This is typically a security Object retriewed from a logon, but can also be a plain password.</xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element name="channel" type="xsd:string">
+                        <xsd:annotation>
+                            <xsd:documentation>Indicated what type of application that initiated the request</xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element name="orgid" type="xsd:string">
+                        <xsd:annotation>
+                            <xsd:documentation>The OrganizationalId - will in a banking context be Financial Institution / Konsernnr</xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element minOccurs="0" name="orgunit" nillable="true" type="xsd:string">
+                        <xsd:annotation>
+                            <xsd:documentation>The Organizational unit will in a banking context be Branch / Registernr</xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element minOccurs="0" name="customerid" nillable="true" type="xsd:string">
+                        <xsd:annotation>
+                            <xsd:documentation>Id of the customer on which the operation is requested, may be the same as userid, but may well be different</xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element minOccurs="0" name="locale" nillable="true" type="xsd:string">
+                        <xsd:annotation>
+                            <xsd:documentation>Locale in a java syntax e.g "en_EN". May be used if application supports localized response</xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element name="ip" type="xsd:string">
+                        <xsd:annotation>
+                            <xsd:documentation>The ip adress of the client</xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element maxOccurs="unbounded" minOccurs="0" name="item" nillable="true" type="itemType">
+                        <xsd:annotation>
+                            <xsd:documentation>Optionnal extention items - Add key/value pairs for application specific extentions</xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="itemType">
+                <xsd:attribute name="key" type="xsd:string" use="required"/>
+                <xsd:attribute name="value" type="xsd:string" use="required"/>
+            </xsd:complexType>
+            <xsd:complexType name="EDBHeaderType">
+                <xsd:sequence>
+                    <xsd:element name="SourceApplication" type="xsd:string">
+                        <xsd:annotation>
+                            <xsd:documentation> Identifies the source that initiated the message. Used to separate different service consumers. </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element name="DestinationApplication" type="xsd:string">
+                        <xsd:annotation>
+                            <xsd:documentation> Identifies the destination of the message. Used to separate different service providers. </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element name="Function" type="xsd:string">
+                        <xsd:annotation>
+                            <xsd:documentation> Identifies the service to be called. </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element name="Version" type="xsd:string">
+                        <xsd:annotation>
+                            <xsd:documentation> Service version "X.Y.Z" according to this standard: X = Main release (major changes, not necessarily backwards compatible) Y = Minor release (backwards compatible, new functionality) Z = Bugfix (backwards compatible, error correction only) </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element name="ClientContext" type="ClientContextType">
+                        <xsd:annotation>
+                            <xsd:documentation> Elements for identifying client context information. </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:element name="AutHeader" type="EDBHeaderType"/>
+            <xsd:complexType name="ResponseStateType">
+                <xsd:sequence>
+                    <xsd:element name="ErrorCode" type="xsd:int">
+                        <xsd:annotation>
+                            <xsd:documentation>Numeric error code reported for this error.</xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element name="Severity" type="xsd:int">
+                        <xsd:annotation>
+                            <xsd:documentation>Response Status Severity Code</xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element name="ComponentId" type="xsd:int">
+                        <xsd:annotation>
+                            <xsd:documentation>Unique code identifying the component returning the service response</xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element name="Message" type="xsd:string">
+                        <xsd:annotation>
+                            <xsd:documentation>Message describing the error. Default is english language. Optionally localized according to the locale parameter in the service request</xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element minOccurs="0" name="LogSequence" nillable="true" type="xsd:long">
+                        <xsd:annotation>
+                            <xsd:documentation>Optional key generated to be used for log correlation purposes.</xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element maxOccurs="unbounded" minOccurs="0" name="errorItem" nillable="true" type="errorItemType">
+                        <xsd:annotation>
+                            <xsd:documentation>Optional extention items - key/value pairs are used for extented error inforamtion.</xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="errorItemType">
+                <xsd:annotation/>
+                <xsd:attribute name="key" type="xsd:string" use="required"/>
+                <xsd:attribute name="value" type="xsd:string" use="required"/>
+            </xsd:complexType>
+        </xsd:schema>
+        <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="urn:fnd.payment.fs.evry.com:ws:fnd-ledger-sync-ws-types:v1_0" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:sch5="urn:fnd.payment.fs.evry.com:domain:fnd-ledger-sync:v1_0" xmlns:sch4="urn:fnd.payment.fs.evry.com:domain:fnd-ledger-sync-iso:v1_0" xmlns:sch3="urn:fnd.payment.fs.evry.com:domain:fnd-common:v1_0" xmlns:sch2="urn:fnd.payment.fs.evry.com:domain:fnd-common-iso:v1_0" xmlns:sch1="http://edb.com/ws/WSCommon_v22" xmlns:sch0="urn:fnd.payment.fs.evry.com:ws:fnd-ledger-sync-ws-types:v1_0" xmlns:iso="urn:fnd.payment.fs.evry.com:domain:fnd-common-iso:v1_0" xmlns:common="urn:fnd.payment.fs.evry.com:domain:fnd-common:v1_0" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="urn:fnd.payment.fs.evry.com:domain:fnd-common-iso:v1_0">
+            <xs:annotation>
+                <xs:documentation> Common ISO20022 type definitions. </xs:documentation>
+            </xs:annotation>
+            <xs:import namespace="urn:fnd.payment.fs.evry.com:domain:fnd-common:v1_0"/>
+            <xs:complexType name="AccountSchemeName1Choice">
+                <xs:choice>
+                    <xs:element name="Cd" type="iso:ExternalAccountIdentification1Code"/>
+                    <xs:element name="Prtry" type="iso:Max35Text"/>
+                </xs:choice>
+            </xs:complexType>
+            <xs:complexType name="AccountIdentification4Choice">
+                <xs:choice>
+                    <xs:element name="IBAN" type="iso:IBAN2007Identifier"/>
+                    <xs:element name="Othr" type="iso:GenericAccountIdentification1"/>
+                </xs:choice>
+            </xs:complexType>
+            <xs:complexType name="ActiveOrHistoricCurrencyAndAmount">
+                <xs:simpleContent>
+                    <xs:extension base="iso:ActiveOrHistoricCurrencyAndAmount_SimpleType">
+                        <xs:attribute name="Ccy" type="iso:ActiveOrHistoricCurrencyCode" use="required"/>
+                    </xs:extension>
+                </xs:simpleContent>
+            </xs:complexType>
+            <xs:complexType name="BranchAndFinancialInstitutionIdentification5">
+                <xs:sequence>
+                    <xs:element name="FinInstnId" type="iso:FinancialInstitutionIdentification8"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="ReservationOrConfirmationId">
+                <xs:annotation>
+                    <xs:documentation>Reservation or confirmation identification details.</xs:documentation>
+                </xs:annotation>
+                <xs:sequence>
+                    <xs:element name="System" type="iso:Fixed3Text">
+                        <xs:annotation>
+                            <xs:documentation>3 letter system name, depicting which system generated the UUID (FND or TRG)</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="Id" type="iso:Max36Text">
+                        <xs:annotation>
+                            <xs:documentation>Universally unique identifier (UUID)</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="CashAccountType2Choice">
+                <xs:choice>
+                    <xs:element name="Cd" type="iso:ExternalCashAccountType1Code"/>
+                    <xs:element name="Prtry" type="iso:Max35Text"/>
+                </xs:choice>
+            </xs:complexType>
+            <xs:complexType name="FinancialIdentificationSchemeName1Choice">
+                <xs:choice>
+                    <xs:element name="Cd" type="iso:ExternalFinancialInstitutionIdentification1Code"/>
+                    <xs:element name="Prtry" type="iso:Max35Text"/>
+                </xs:choice>
+            </xs:complexType>
+            <xs:complexType name="FinancialInstitutionIdentification8">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="BICFI" type="iso:BICFIIdentifier"/>
+                    <xs:element name="Othr" type="iso:GenericFinancialIdentification1"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="GenericAccountIdentification1">
+                <xs:sequence>
+                    <xs:element name="Id" type="iso:Max34Text">
+                        <xs:annotation>
+                            <xs:documentation>Domestic account number (BBAN).</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element minOccurs="0" name="SchmeNm" type="iso:AccountSchemeName1Choice"/>
+                    <xs:element minOccurs="0" name="Issr" type="iso:Max35Text"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="GenericFinancialIdentification1">
+                <xs:sequence>
+                    <xs:element name="Id" type="iso:Max35Text"/>
+                    <xs:element minOccurs="0" name="SchmeNm" type="iso:FinancialIdentificationSchemeName1Choice"/>
+                    <xs:element minOccurs="0" name="Issr" type="iso:Max35Text"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="BankTransactionCodeStructure4">
+                <xs:sequence>
+                    <xs:element name="Domn" type="iso:BankTransactionCodeStructure5">
+                        <xs:annotation>
+                            <xs:documentation>Examples of Domains: Payments, Cash Management, Loans and Deposits etc.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element minOccurs="0" name="Prtry" type="iso:ProprietaryBankTransactionCodeStructure1">
+                        <xs:annotation>
+                            <xs:documentation>The proprietary transaction code is an EVRY internal supplementary code and may be used to further specify internal variations of the domain model.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="BankTransactionCodeStructure5">
+                <xs:sequence>
+                    <xs:element name="Cd" type="iso:ExternalBankTransactionDomain1Code">
+                        <xs:annotation>
+                            <xs:documentation>The Cd is a 4 letter combination, ie.: PMNT</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element minOccurs="0" name="Fmly" type="iso:BankTransactionCodeStructure6">
+                        <xs:annotation>
+                            <xs:documentation>Examples of Family: Customer/Merchant Card Transactions, Counter Transactions, Issued Credits etc.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="BankTransactionCodeStructure6">
+                <xs:sequence>
+                    <xs:element name="Cd" type="iso:ExternalBankTransactionFamily1Code"/>
+                    <xs:element minOccurs="0" name="SubFmlyCd" type="iso:ExternalBankTransactionSubFamily1Code">
+                        <xs:annotation>
+                            <xs:documentation>Examples of SubFamily: Cash Deposits, Point-Of-Sale, Corporate Own AccountTransfer etc.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="CurrencyExchange5">
+                <xs:sequence>
+                    <xs:element name="SrcCcy" type="iso:ActiveOrHistoricCurrencyCode"/>
+                    <xs:element minOccurs="0" name="TrgtCcy" type="iso:ActiveOrHistoricCurrencyCode"/>
+                    <xs:element minOccurs="0" name="UnitCcy" type="iso:ActiveOrHistoricCurrencyCode"/>
+                    <xs:element name="XchgRate" type="iso:BaseOneRate"/>
+                    <xs:element minOccurs="0" name="CtrctId" type="iso:Max35Text"/>
+                    <xs:element minOccurs="0" name="QtnDt" type="iso:ISODateTime"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="ProprietaryBankTransactionCodeStructure1">
+                <xs:sequence>
+                    <xs:element name="Cd" type="iso:Max35Text"/>
+                    <xs:element minOccurs="0" name="Issr" type="iso:Max35Text">
+                        <xs:annotation>
+                            <xs:documentation>Ie.: EVRY</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="PurposeType">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="Cd" type="iso:ExternalPurpose1Code">
+                        <xs:annotation>
+                            <xs:documentation>ISO20022 codeset specifies the low-level purpose of the transaction based on a set of pre-defined values. Not to be used in TG.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element minOccurs="0" name="Prtry" type="iso:Max150Text">
+                        <xs:annotation>
+                            <xs:documentation>Short message used for the beneficiary's statement of account.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="AmountAndCurrencyExchangeDetails3">
+                <xs:sequence>
+                    <xs:element name="Amt" type="iso:ActiveOrHistoricCurrencyAndAmount"/>
+                    <xs:element minOccurs="0" name="CcyXchg" type="iso:CurrencyExchange5"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="AmountAndCurrencyExchangeDetails4">
+                <xs:sequence>
+                    <xs:element name="Tp" type="iso:Max35Text"/>
+                    <xs:element name="Amt" type="iso:ActiveOrHistoricCurrencyAndAmount"/>
+                    <xs:element minOccurs="0" name="CcyXchg" type="iso:CurrencyExchange5"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="TransactionAccountDetailsV01">
+                <xs:sequence>
+                    <xs:element name="Id" type="iso:AccountIdentification4Choice"/>
+                    <xs:element minOccurs="0" name="Tp" type="iso:CashAccountType2Choice"/>
+                    <xs:element minOccurs="0" name="Ccy" type="iso:ActiveOrHistoricCurrencyCode"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="DateAndTimeV01">
+                <xs:annotation>
+                    <xs:documentation>Group of different date types included in the transaction.</xs:documentation>
+                </xs:annotation>
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="ValDt" type="iso:ISODate">
+                        <xs:annotation>
+                            <xs:documentation>The assigned value date for this transaction.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element minOccurs="0" name="ExpDt" type="iso:ISODate">
+                        <xs:annotation>
+                            <xs:documentation>Expiry date.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="TransactionTypeInfoV01">
+                <xs:annotation>
+                    <xs:documentation>The transaction type info contains information categorizing different transaction types.</xs:documentation>
+                </xs:annotation>
+                <xs:sequence>
+                    <xs:element name="BkTxCd" type="iso:BankTransactionCodeStructure4">
+                        <xs:annotation>
+                            <xs:documentation>Bank Transaction Code. The Domain model is divided into three levels. Ie.: Domain=PMNT (Payments), Family=CCRD (Customer Card Transactions), SubFamily=POSD (Point-Of-Sale Debit card). See all at: http://www.iso20022.org/external_code_list.page</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="PeriodNumber">
+                <xs:annotation>
+                    <xs:documentation>Information about the ledgers batch cycle.</xs:documentation>
+                </xs:annotation>
+                <xs:sequence>
+                    <xs:element name="LdgDt" type="iso:ISODate">
+                        <xs:annotation>
+                            <xs:documentation>Booking date in Ledger</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="LdgSyncId">
+                        <xs:annotation>
+                            <xs:documentation>Sequence number within Ledger date.</xs:documentation>
+                        </xs:annotation>
+                        <xs:simpleType>
+                            <xs:restriction base="iso:Max2Num">
+                                <xs:minInclusive value="1"/>
+                                <xs:maxInclusive value="99"/>
+                            </xs:restriction>
+                        </xs:simpleType>
+                    </xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="LedgerInfoV01">
+                <xs:annotation>
+                    <xs:documentation>Information about the ledgers batch cycle.</xs:documentation>
+                </xs:annotation>
+                <xs:sequence>
+                    <xs:element name="LdgId" type="iso:Max35Text">
+                        <xs:annotation>
+                            <xs:documentation>An identification of a ledger system. Ie.: CORE</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element minOccurs="0" name="LdgDt" type="iso:ISODate">
+                        <xs:annotation>
+                            <xs:documentation>Bookung date in Ledger</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element minOccurs="0" name="LdgSyncId">
+                        <xs:annotation>
+                            <xs:documentation>Sequence number within Ledger date.</xs:documentation>
+                        </xs:annotation>
+                        <xs:simpleType>
+                            <xs:restriction base="iso:Max2Num">
+                                <xs:minInclusive value="1"/>
+                                <xs:maxInclusive value="99"/>
+                            </xs:restriction>
+                        </xs:simpleType>
+                    </xs:element>
+                    <xs:element minOccurs="0" name="Desc" type="iso:Max50Text">
+                        <xs:annotation>
+                            <xs:documentation>Short message used for ledger</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="ReconciliationIdV01">
+                <xs:annotation>
+                    <xs:documentation>External References makes it possible to transfer references not specified by the format.</xs:documentation>
+                </xs:annotation>
+                <xs:sequence>
+                    <xs:element name="RconItmKey" type="iso:ReconciliationItem1Code">
+                        <xs:annotation>
+                            <xs:documentation>This item holds information about how to reconcile a reservation. i.e.: RSID=ReservationId or CAAI=Card authorization Id</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element minOccurs="0" name="RconItmVal" type="iso:Max39Text">
+                        <xs:annotation>
+                            <xs:documentation>Item used for reconciliation if it is not possible to send reservation id in the booking.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="RconItemsV01">
+                <xs:annotation>
+                    <xs:documentation>External References makes it possible to transfer references not specified by the format.</xs:documentation>
+                </xs:annotation>
+                <xs:sequence>
+                    <xs:element name="RconRule" type="iso:ReconciliationItem1Code">
+                        <xs:annotation>
+                            <xs:documentation>This item holds information about how to reconcile a reservation. i.e.: RSID=ReservationId or CAAI=Card authorization Id</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element minOccurs="0" name="RconRef" type="iso:Max39Text">
+                        <xs:annotation>
+                            <xs:documentation>Item used for reconciliation if it is not possible to send reservation id in the booking.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element minOccurs="0" name="RconGenRef" type="iso:RconGenRefVal">
+                        <xs:annotation>
+                            <xs:documentation>Use this item to say that Fundscheck shall generate the vallue in item RconRef. Valid values in current version: CAAI generates 6 digits.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:simpleType name="ActiveOrHistoricCurrencyAndAmount_SimpleType">
+                <xs:restriction base="xs:decimal">
+                    <xs:fractionDigits value="5"/>
+                    <xs:totalDigits value="18"/>
+                    <xs:minInclusive value="0"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:simpleType name="ActiveOrHistoricCurrencyCode">
+                <xs:restriction base="xs:string">
+                    <xs:pattern value="[A-Z]{3,3}"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:simpleType name="Fixed3Text">
+                <xs:restriction base="xs:string">
+                    <xs:pattern value="[A-Z]{3,3}"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:simpleType name="BaseOneRate">
+                <xs:restriction base="xs:decimal">
+                    <xs:fractionDigits value="10"/>
+                    <xs:totalDigits value="11"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:simpleType name="BICFIIdentifier">
+                <xs:restriction base="xs:string">
+                    <xs:pattern value="[A-Z]{6,6}[A-Z2-9][A-NP-Z0-9]([A-Z0-9]{3,3}){0,1}"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:simpleType name="ExternalAccountIdentification1Code">
+                <xs:restriction base="xs:string">
+                    <xs:minLength value="1"/>
+                    <xs:maxLength value="4"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:simpleType name="ExternalBankTransactionDomain1Code">
+                <xs:restriction base="xs:string">
+                    <xs:minLength value="1"/>
+                    <xs:maxLength value="4"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:simpleType name="ExternalBankTransactionFamily1Code">
+                <xs:restriction base="xs:string">
+                    <xs:minLength value="1"/>
+                    <xs:maxLength value="4"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:simpleType name="ExternalBankTransactionSubFamily1Code">
+                <xs:restriction base="xs:string">
+                    <xs:minLength value="1"/>
+                    <xs:maxLength value="4"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:simpleType name="ExternalCashAccountType1Code">
+                <xs:restriction base="xs:string">
+                    <xs:minLength value="1"/>
+                    <xs:maxLength value="4"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:simpleType name="ExternalFinancialInstitutionIdentification1Code">
+                <xs:restriction base="xs:string">
+                    <xs:minLength value="1"/>
+                    <xs:maxLength value="4"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:simpleType name="ExternalPurpose1Code">
+                <xs:restriction base="xs:string">
+                    <xs:minLength value="1"/>
+                    <xs:maxLength value="4"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:simpleType name="IBAN2007Identifier">
+                <xs:restriction base="xs:string">
+                    <xs:pattern value="[A-Z]{2,2}[0-9]{2,2}[a-zA-Z0-9]{1,30}"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:simpleType name="Max15Text">
+                <xs:restriction base="xs:string">
+                    <xs:minLength value="1"/>
+                    <xs:maxLength value="15"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:simpleType name="ISODateTime">
+                <xs:annotation>
+                    <xs:documentation>Specify date and time value. Supports ISO_LOCAL_DATE_TIME, ISO_OFFSET_DATE_TIME formats. Examples: 2015-12-12T10:15:30+01:00, 2015-12-12T10:15:30, 2015-12-12T10:15:30+01:00Z </xs:documentation>
+                </xs:annotation>
+                <xs:restriction base="xs:dateTime"/>
+            </xs:simpleType>
+            <xs:simpleType name="Max34Text">
+                <xs:restriction base="xs:string">
+                    <xs:minLength value="1"/>
+                    <xs:maxLength value="34"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:simpleType name="Max35Text">
+                <xs:restriction base="xs:string">
+                    <xs:minLength value="1"/>
+                    <xs:maxLength value="35"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:simpleType name="ISODate">
+                <xs:restriction base="xs:date"/>
+            </xs:simpleType>
+            <xs:simpleType name="ReconciliationItem1Code">
+                <xs:restriction base="xs:string">
+                    <xs:minLength value="1"/>
+                    <xs:maxLength value="4"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:simpleType name="CreditDebitIndicator1Code">
+                <xs:annotation>
+                    <xs:documentation>Indicates an amount's sign</xs:documentation>
+                </xs:annotation>
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="CRDT"/>
+                    <xs:enumeration value="DBIT"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:simpleType name="AccountResponseStateV01">
+                <xs:annotation>
+                    <xs:documentation>Status of the account OK(Shall display when Account exists), NF(Shall display when Account not found) and UE(Unspecified error shall display if input request fails with any error other than account closed and account not found)</xs:documentation>
+                </xs:annotation>
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="OK"/>
+                    <xs:enumeration value="NF"/>
+                    <xs:enumeration value="UE"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:simpleType name="TrueOrFalseIndicator">
+                <xs:restriction base="xs:boolean"/>
+            </xs:simpleType>
+            <xs:simpleType name="Max36Text">
+                <xs:restriction base="xs:string">
+                    <xs:minLength value="1"/>
+                    <xs:maxLength value="36"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:simpleType name="Fixed36Text">
+                <xs:restriction base="xs:string">
+                    <xs:minLength value="36"/>
+                    <xs:maxLength value="36"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:simpleType name="Max39Text">
+                <xs:restriction base="xs:string">
+                    <xs:minLength value="1"/>
+                    <xs:maxLength value="39"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:simpleType name="Max50Text">
+                <xs:restriction base="xs:string">
+                    <xs:minLength value="1"/>
+                    <xs:maxLength value="50"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:simpleType name="Max70Text">
+                <xs:restriction base="xs:string">
+                    <xs:minLength value="1"/>
+                    <xs:maxLength value="70"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:simpleType name="Max250Text">
+                <xs:restriction base="xs:string">
+                    <xs:minLength value="1"/>
+                    <xs:maxLength value="250"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:simpleType name="Max128Text">
+                <xs:restriction base="xs:string">
+                    <xs:minLength value="1"/>
+                    <xs:maxLength value="128"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:simpleType name="Max140Text">
+                <xs:restriction base="xs:string">
+                    <xs:minLength value="1"/>
+                    <xs:maxLength value="140"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:simpleType name="Max150Text">
+                <xs:restriction base="xs:string">
+                    <xs:minLength value="1"/>
+                    <xs:maxLength value="150"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:simpleType name="Max255Text">
+                <xs:restriction base="xs:string">
+                    <xs:minLength value="1"/>
+                    <xs:maxLength value="255"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:simpleType name="ISOCountry">
+                <xs:restriction base="xs:string">
+                    <xs:pattern value="[A-Z]{2,2}"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:simpleType name="CoverageControlType1Code">
+                <xs:restriction base="xs:string">
+                    <xs:minLength value="1"/>
+                    <xs:maxLength value="4"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:simpleType name="ConfId">
+                <xs:restriction base="iso:Max35Text"/>
+            </xs:simpleType>
+            <xs:simpleType name="Max2Num">
+                <xs:restriction base="xs:integer">
+                    <xs:minInclusive value="0"/>
+                    <xs:maxInclusive value="99"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:simpleType name="Max3Num">
+                <xs:restriction base="xs:integer">
+                    <xs:minInclusive value="1"/>
+                    <xs:maxInclusive value="999"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:simpleType name="Max18Num">
+                <xs:restriction base="xs:integer">
+                    <xs:pattern value="[0-9]{1,18}"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:simpleType name="Max19Num">
+                <xs:restriction base="xs:integer">
+                    <xs:pattern value="[0-9]{1,19}"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:simpleType name="RconGenRefVal">
+                <xs:restriction base="xs:string">
+                    <xs:length value="4"/>
+                    <xs:enumeration value="CAAI"/>
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:schema>
+        <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="urn:fnd.payment.fs.evry.com:ws:fnd-ledger-sync-ws-types:v1_0" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:sch5="urn:fnd.payment.fs.evry.com:domain:fnd-ledger-sync:v1_0" xmlns:sch4="urn:fnd.payment.fs.evry.com:domain:fnd-ledger-sync-iso:v1_0" xmlns:sch3="urn:fnd.payment.fs.evry.com:domain:fnd-common:v1_0" xmlns:sch2="urn:fnd.payment.fs.evry.com:domain:fnd-common-iso:v1_0" xmlns:sch1="http://edb.com/ws/WSCommon_v22" xmlns:sch0="urn:fnd.payment.fs.evry.com:ws:fnd-ledger-sync-ws-types:v1_0" xmlns:iso="urn:fnd.payment.fs.evry.com:domain:fnd-common-iso:v1_0" xmlns:common="urn:fnd.payment.fs.evry.com:domain:fnd-common:v1_0" xmlns:autheader="http://edb.com/ws/WSCommon_v22" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="urn:fnd.payment.fs.evry.com:domain:fnd-common:v1_0">
+            <xs:annotation>
+                <xs:documentation>Common type definitions.</xs:documentation>
+            </xs:annotation>
+            <xs:import namespace="http://edb.com/ws/WSCommon_v22"/>
+            <xs:import namespace="urn:fnd.payment.fs.evry.com:domain:fnd-common-iso:v1_0"/>
+            <xs:group name="AuditInfo">
+                <xs:annotation/>
+                <xs:sequence>
+                    <xs:element name="CrtdBy" type="iso:Max35Text">
+                        <xs:annotation>
+                            <xs:documentation>Created user information</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="ModfBy" type="iso:Max35Text">
+                        <xs:annotation>
+                            <xs:documentation>Modified user information</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="CrtdTm" type="iso:ISODateTime">
+                        <xs:annotation>
+                            <xs:documentation>Time of creation</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="ModfTm" type="iso:ISODateTime">
+                        <xs:annotation>
+                            <xs:documentation>Last time that an account is modified. Time with date.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:group>
+            <xs:complexType name="GroupHeaderV01">
+                <xs:annotation>
+                    <xs:documentation>The online header is used for possible duplicate controls and to hold other technical references.</xs:documentation>
+                </xs:annotation>
+                <xs:sequence>
+                    <xs:element name="MsgId" type="common:MessageInfoV01">
+                        <xs:annotation>
+                            <xs:documentation>A unique identification from sender.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="CreDtTm" type="iso:ISODateTime">
+                        <xs:annotation>
+                            <xs:documentation>Created time is a timestamp from sender.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element minOccurs="0" name="PssblDpl" type="iso:TrueOrFalseIndicator">
+                        <xs:annotation>
+                            <xs:documentation>Flag used to indicate that this request might be a duplicate.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="Countrycode" type="iso:ISOCountry">
+                        <xs:annotation>
+                            <xs:documentation>Gives the country code</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="MessageInfoV01">
+                <xs:annotation>
+                    <xs:documentation>Information about the received message (file).</xs:documentation>
+                </xs:annotation>
+                <xs:sequence>
+                    <xs:element name="BSId" type="iso:Max35Text">
+                        <xs:annotation>
+                            <xs:documentation>An identification of a senders business system. Ie.: NETS</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element minOccurs="0" name="MsgTp" type="iso:Max35Text">
+                        <xs:annotation>
+                            <xs:documentation>The message type of this file. Ie.: FINPAY</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="UId" type="iso:Max36Text">
+                        <xs:annotation>
+                            <xs:documentation>A unique identification of this message Ie.: 01 (file delivery number) in batch or de305d54-75b4-431b-adb2-eb6b9e546013 (UUID) in online.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:simpleType name="pageLengthType">
+                <xs:annotation>
+                    <xs:documentation>An type capable of describing a segments length or wished length</xs:documentation>
+                </xs:annotation>
+                <xs:restriction base="xs:int">
+                    <xs:minInclusive value="0"/>
+                    <xs:maxInclusive value="500"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:simpleType name="pageIndexType">
+                <xs:annotation>
+                    <xs:documentation>Index of segment start</xs:documentation>
+                </xs:annotation>
+                <xs:restriction base="xs:int">
+                    <xs:minInclusive value="0"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:complexType name="pagingInputElementType">
+                <xs:annotation>
+                    <xs:documentation>Describes a paging segment</xs:documentation>
+                </xs:annotation>
+                <xs:sequence>
+                    <xs:element name="startIndex" type="common:pageIndexType"/>
+                    <xs:element name="pageSize" type="common:pageLengthType"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="pagingOutputElementType">
+                <xs:annotation>
+                    <xs:documentation>Describes the returned segment</xs:documentation>
+                </xs:annotation>
+                <xs:sequence>
+                    <xs:element name="numberOfElements" type="common:pageLengthType">
+                        <xs:annotation>
+                            <xs:documentation>Number of elements returned</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="moreElementsAvailable" type="iso:TrueOrFalseIndicator">
+                        <xs:annotation>
+                            <xs:documentation>Boolean variable indicating whether there are more occurrences available.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType abstract="true" name="pageResultType">
+                <xs:annotation>
+                    <xs:documentation>Wraps paging and data elements</xs:documentation>
+                </xs:annotation>
+                <xs:sequence>
+                    <xs:element name="pagingOutput" type="common:pagingOutputElementType"/>
+                    <xs:element name="elements">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:any namespace="##other"/>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="responseStateCodedFault">
+                <xs:annotation>
+                    <xs:documentation>Generic SoapFault type</xs:documentation>
+                </xs:annotation>
+                <xs:sequence>
+                    <xs:element name="ResponseState" type="autheader:ResponseStateType">
+                        <xs:annotation>
+                            <xs:documentation>Contains the distinct error-code and additional information on the actual error.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="LogId" type="iso:Max128Text">
+                        <xs:annotation>
+                            <xs:documentation>Represents the log identification mapped to correlation id generated by business event log. For list and read operations the value of this field will be "0" </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType abstract="true" name="baseResponseType">
+                <xs:annotation>
+                    <xs:documentation>Base response type which all services should extend off</xs:documentation>
+                </xs:annotation>
+                <xs:sequence>
+                    <xs:element name="ResponseState" type="autheader:ResponseStateType">
+                        <xs:annotation>
+                            <xs:documentation>The response state which describes the outcome of calling the service.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="LogId" type="iso:Max128Text">
+                        <xs:annotation>
+                            <xs:documentation>Represents the log identification mapped to correlation id generated by business event log. For list and read operations the value of this field will be "0" </xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="AuditInfoType">
+                <xs:annotation/>
+                <xs:sequence>
+                    <xs:group ref="common:AuditInfo"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="BalanceAndCurrencyDetailsV01">
+                <xs:sequence>
+                    <xs:element name="Amt" type="iso:ActiveOrHistoricCurrencyAndAmount"/>
+                    <xs:element name="CdtDbtInd" type="iso:CreditDebitIndicator1Code">
+                        <xs:annotation>
+                            <xs:documentation>Value will be CRDT i amount is zero or above, DBIT if amount is negative.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="TransactionBalanceDetailsV01">
+                <xs:sequence>
+                    <xs:element name="AvlbBalBfrTx" type="common:BalanceAndCurrencyDetailsV01">
+                        <xs:annotation>
+                            <xs:documentation>Available balance before the transaction.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="AvlbBalAftTx" type="common:BalanceAndCurrencyDetailsV01">
+                        <xs:annotation>
+                            <xs:documentation>Available balance after the transaction. For confirmations this might be equal the before balance because a reservation might have been reconciliated.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="AmountDetailsV01">
+                <xs:sequence>
+                    <xs:element name="TxAmt" type="iso:AmountAndCurrencyExchangeDetails3">
+                        <xs:annotation>
+                            <xs:documentation>Transaction amount in the accounts currency. This is the amount to be posted on the account.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="CdtDbtInd" type="iso:CreditDebitIndicator1Code">
+                        <xs:annotation>
+                            <xs:documentation>Value will be CRDT if amount is zero or above, DBIT if amount is negative.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="TxnCntrValAmountDetailsV01">
+                <xs:sequence>
+                    <xs:element name="TxAmt" type="iso:AmountAndCurrencyExchangeDetails3">
+                        <xs:annotation>
+                            <xs:documentation>Transaction amount in the accounts currency. This is the amount to be posted on the account.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element minOccurs="0" name="CntrValAmt" type="iso:AmountAndCurrencyExchangeDetails3">
+                        <xs:annotation>
+                            <xs:documentation>Counter Value Amount. This is the amount used to send to cashpool. This element should not be passed for Double reservation delete request, it is added in double reservation delete request to avoid duplicate</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="CdtDbtInd" type="iso:CreditDebitIndicator1Code">
+                        <xs:annotation>
+                            <xs:documentation>Value will be CRDT if amount is zero or above, DBIT if amount is negative.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="ServiceDetailsV01">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="PssblDpl" type="iso:TrueOrFalseIndicator">
+                        <xs:annotation>
+                            <xs:documentation>Flag used to indicate that this request might be a duplicate.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:simpleType name="SimulateReservationCode">
+                <xs:annotation>
+                    <xs:documentation>Indicates types of Simulate Reservation</xs:documentation>
+                </xs:annotation>
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="A"/>
+                    <xs:enumeration value="B"/>
+                    <xs:enumeration value="C"/>
+                    <xs:enumeration value="N"/>
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:complexType name="errorItemType">
+                <xs:annotation>
+                    <xs:documentation>Key/value pair, error Code and error message</xs:documentation>
+                </xs:annotation>
+                <xs:attribute name="errorCode" type="xs:string" use="required"/>
+                <xs:attribute name="errorMessage" type="xs:string" use="required"/>
+            </xs:complexType>
+        </xs:schema>
+        <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="urn:fnd.payment.fs.evry.com:ws:fnd-ledger-sync-ws-types:v1_0" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:sch5="urn:fnd.payment.fs.evry.com:domain:fnd-ledger-sync:v1_0" xmlns:sch4="urn:fnd.payment.fs.evry.com:domain:fnd-ledger-sync-iso:v1_0" xmlns:sch3="urn:fnd.payment.fs.evry.com:domain:fnd-common:v1_0" xmlns:sch2="urn:fnd.payment.fs.evry.com:domain:fnd-common-iso:v1_0" xmlns:sch1="http://edb.com/ws/WSCommon_v22" xmlns:sch0="urn:fnd.payment.fs.evry.com:ws:fnd-ledger-sync-ws-types:v1_0" xmlns:iso="urn:fnd.payment.fs.evry.com:domain:fnd-common-iso:v1_0" xmlns:common="urn:fnd.payment.fs.evry.com:domain:fnd-common:v1_0" xmlns="urn:fnd.payment.fs.evry.com:domain:fnd-ledger-sync-iso:v1_0" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="urn:fnd.payment.fs.evry.com:domain:fnd-ledger-sync-iso:v1_0">
+            <xs:annotation>
+                <xs:documentation> ISO20022 type definitions. </xs:documentation>
+            </xs:annotation>
+            <xs:import namespace="urn:fnd.payment.fs.evry.com:domain:fnd-common:v1_0"/>
+            <xs:import namespace="urn:fnd.payment.fs.evry.com:domain:fnd-common-iso:v1_0"/>
+        </xs:schema>
+        <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="urn:fnd.payment.fs.evry.com:ws:fnd-ledger-sync-ws-types:v1_0" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:sch5="urn:fnd.payment.fs.evry.com:domain:fnd-ledger-sync:v1_0" xmlns:sch4="urn:fnd.payment.fs.evry.com:domain:fnd-ledger-sync-iso:v1_0" xmlns:sch3="urn:fnd.payment.fs.evry.com:domain:fnd-common:v1_0" xmlns:sch2="urn:fnd.payment.fs.evry.com:domain:fnd-common-iso:v1_0" xmlns:sch1="http://edb.com/ws/WSCommon_v22" xmlns:sch0="urn:fnd.payment.fs.evry.com:ws:fnd-ledger-sync-ws-types:v1_0" xmlns:ledgersync="urn:fnd.payment.fs.evry.com:domain:fnd-ledger-sync:v1_0" xmlns:ledger-iso="urn:fnd.payment.fs.evry.com:domain:fnd-ledger-sync-iso:v1_0" xmlns:iso="urn:fnd.payment.fs.evry.com:domain:fnd-common-iso:v1_0" xmlns:common="urn:fnd.payment.fs.evry.com:domain:fnd-common:v1_0" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="urn:fnd.payment.fs.evry.com:domain:fnd-ledger-sync:v1_0">
+            <xs:import namespace="urn:fnd.payment.fs.evry.com:domain:fnd-common:v1_0"/>
+            <xs:import namespace="urn:fnd.payment.fs.evry.com:domain:fnd-common-iso:v1_0"/>
+            <xs:import namespace="urn:fnd.payment.fs.evry.com:domain:fnd-ledger-sync-iso:v1_0"/>
+            <xs:complexType name="BookedConfirmationType">
+                <xs:annotation/>
+                <xs:sequence>
+                    <xs:element name="Agt" type="iso:BranchAndFinancialInstitutionIdentification5">
+                        <xs:annotation>
+                            <xs:documentation>Identifies the bank</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="Acct" type="iso:TransactionAccountDetailsV01">
+                        <xs:annotation>
+                            <xs:documentation>Account number.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="AmtDtls" type="common:AmountDetailsV01">
+                        <xs:annotation>
+                            <xs:documentation>Amount details.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="TxTpInf" type="iso:TransactionTypeInfoV01">
+                        <xs:annotation>
+                            <xs:documentation>Group categorizing the transaction type.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="PeriodNum" type="iso:PeriodNumber">
+                        <xs:annotation>
+                            <xs:documentation>Period number holds information about the ledger date and ledger syncId</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="Purp" type="iso:PurposeType"/>
+                    <xs:element name="ValDt" type="iso:ISODate">
+                        <xs:annotation>
+                            <xs:documentation>Value date</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="LedgerSyncType">
+                <xs:annotation/>
+                <xs:sequence>
+                    <xs:element name="Agt" type="iso:BranchAndFinancialInstitutionIdentification5">
+                        <xs:annotation>
+                            <xs:documentation>Identifies the bank.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="Acct" type="iso:TransactionAccountDetailsV01">
+                        <xs:annotation>
+                            <xs:documentation>Account number.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="LdgInf" type="iso:LedgerInfoV01">
+                        <xs:annotation>
+                            <xs:documentation>Ledger Information</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="DeleteConfirmationPostedInLedgerType">
+                <xs:annotation/>
+                <xs:sequence>
+                    <xs:element name="Agt" type="iso:BranchAndFinancialInstitutionIdentification5">
+                        <xs:annotation>
+                            <xs:documentation>Identifies the bank on behalf of the debtor.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="Acct" type="iso:TransactionAccountDetailsV01">
+                        <xs:annotation>
+                            <xs:documentation>Debtors account number.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="ConfId" type="iso:ReservationOrConfirmationId">
+                        <xs:annotation>
+                            <xs:documentation>Identifies the confirmation and source system</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element minOccurs="0" name="RefusedInLedger" type="iso:TrueOrFalseIndicator">
+                        <xs:annotation>
+                            <xs:documentation>Use this item to indicate that the confirmation is refused in ledger. Value True means it is refused.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="ListLedgerResponseType">
+                <xs:sequence>
+                    <xs:element name="LdgInf" type="iso:LedgerInfoV01">
+                        <xs:annotation>
+                            <xs:documentation>Identifies the bank</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="LastUpd" type="iso:ISODateTime"/>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="createLedgerPeriodFault">
+        <wsdl:part element="tns:createLedgerPeriodFault" name="createLedgerPeriodFault"> </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="createLedgerPeriodResponse">
+        <wsdl:part element="tns:createLedgerPeriodResponse" name="createLedgerPeriodResponse"> </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="ledgerConfirmationFault">
+        <wsdl:part element="tns:ledgerConfirmationFault" name="ledgerConfirmationFault"> </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="newLedgerPeriodRequest">
+        <wsdl:part element="sch1:AutHeader" name="SoapHeader"> </wsdl:part>
+        <wsdl:part element="tns:newLedgerPeriodRequest" name="newLedgerPeriodRequest"> </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="ledgerConfirmationResponse">
+        <wsdl:part element="tns:ledgerConfirmationResponse" name="ledgerConfirmationResponse"> </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="listLedgerInformationResponse">
+        <wsdl:part element="tns:listLedgerInformationResponse" name="listLedgerInformationResponse"> </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="newLedgerPeriodResponse">
+        <wsdl:part element="tns:newLedgerPeriodResponse" name="newLedgerPeriodResponse"> </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="createLedgerPeriodRequest">
+        <wsdl:part element="sch1:AutHeader" name="SoapHeader"> </wsdl:part>
+        <wsdl:part element="tns:createLedgerPeriodRequest" name="createLedgerPeriodRequest"> </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="balanceSynchronizationFromLedgerResponse">
+        <wsdl:part element="tns:balanceSynchronizationFromLedgerResponse" name="balanceSynchronizationFromLedgerResponse"> </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="balanceSynchronizationFromLedgerFault">
+        <wsdl:part element="tns:balanceSynchronizationFromLedgerFault" name="balanceSynchronizationFromLedgerFault"> </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="deleteConfirmationPostedInLedgerFault">
+        <wsdl:part element="tns:deleteConfirmationPostedInLedgerFault" name="deleteConfirmationPostedInLedgerFault"> </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="deleteConfirmationPostedInLedgerResponse">
+        <wsdl:part element="tns:deleteConfirmationPostedInLedgerResponse" name="deleteConfirmationPostedInLedgerResponse"> </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="deleteConfirmationPostedInLedgerRequest">
+        <wsdl:part element="sch1:AutHeader" name="SoapHeader"> </wsdl:part>
+        <wsdl:part element="tns:deleteConfirmationPostedInLedgerRequest" name="deleteConfirmationPostedInLedgerRequest"> </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="listLedgerInformationFault">
+        <wsdl:part element="tns:listLedgerInformationFault" name="listLedgerInformationFault"> </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="listLedgerInformationRequest">
+        <wsdl:part element="sch1:AutHeader" name="SoapHeader"> </wsdl:part>
+        <wsdl:part element="tns:listLedgerInformationRequest" name="listLedgerInformationRequest"> </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="balanceSynchronizationFromLedgerRequest">
+        <wsdl:part element="sch1:AutHeader" name="SoapHeader"> </wsdl:part>
+        <wsdl:part element="tns:balanceSynchronizationFromLedgerRequest" name="balanceSynchronizationFromLedgerRequest"> </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="ledgerConfirmationRequest">
+        <wsdl:part element="sch1:AutHeader" name="SoapHeader"> </wsdl:part>
+        <wsdl:part element="tns:ledgerConfirmationRequest" name="ledgerConfirmationRequest"> </wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="newLedgerPeriodFault">
+        <wsdl:part element="tns:newLedgerPeriodFault" name="newLedgerPeriodFault"> </wsdl:part>
+    </wsdl:message>
+    <wsdl:portType name="FNDSLedgerSyncService_V1.0PortType">
+        <wsdl:operation name="createLedgerPeriod">
+            <wsdl:input message="tns:createLedgerPeriodRequest" name="createLedgerPeriodRequest"> </wsdl:input>
+            <wsdl:output message="tns:createLedgerPeriodResponse" name="createLedgerPeriodResponse"> </wsdl:output>
+            <wsdl:fault message="tns:createLedgerPeriodFault" name="createLedgerPeriodFault"> </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="ledgerConfirmation">
+            <wsdl:input message="tns:ledgerConfirmationRequest" name="ledgerConfirmationRequest"> </wsdl:input>
+            <wsdl:output message="tns:ledgerConfirmationResponse" name="ledgerConfirmationResponse"> </wsdl:output>
+            <wsdl:fault message="tns:ledgerConfirmationFault" name="ledgerConfirmationFault"> </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="newLedgerPeriod">
+            <wsdl:input message="tns:newLedgerPeriodRequest" name="newLedgerPeriodRequest"> </wsdl:input>
+            <wsdl:output message="tns:newLedgerPeriodResponse" name="newLedgerPeriodResponse"> </wsdl:output>
+            <wsdl:fault message="tns:newLedgerPeriodFault" name="newLedgerPeriodFault"> </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="listLedgerInformation">
+            <wsdl:input message="tns:listLedgerInformationRequest" name="listLedgerInformationRequest"> </wsdl:input>
+            <wsdl:output message="tns:listLedgerInformationResponse" name="listLedgerInformationResponse"> </wsdl:output>
+            <wsdl:fault message="tns:listLedgerInformationFault" name="listLedgerInformationFault"> </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="balanceSynchronizationFromLedger">
+            <wsdl:input message="tns:balanceSynchronizationFromLedgerRequest" name="balanceSynchronizationFromLedgerRequest"> </wsdl:input>
+            <wsdl:output message="tns:balanceSynchronizationFromLedgerResponse" name="balanceSynchronizationFromLedgerResponse"> </wsdl:output>
+            <wsdl:fault message="tns:balanceSynchronizationFromLedgerFault" name="balanceSynchronizationFromLedgerFault"> </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="deleteConfirmationPostedInLedger">
+            <wsdl:input message="tns:deleteConfirmationPostedInLedgerRequest" name="deleteConfirmationPostedInLedgerRequest"> </wsdl:input>
+            <wsdl:output message="tns:deleteConfirmationPostedInLedgerResponse" name="deleteConfirmationPostedInLedgerResponse"> </wsdl:output>
+            <wsdl:fault message="tns:deleteConfirmationPostedInLedgerFault" name="deleteConfirmationPostedInLedgerFault"> </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="FNDSLedgerSyncService_V1.0PortTypeSoap11" type="tns:FNDSLedgerSyncService_V1.0PortType">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="createLedgerPeriod">
+            <soap:operation soapAction=""/>
+            <wsdl:input name="createLedgerPeriodRequest">
+                <soap:header message="tns:createLedgerPeriodRequest" part="SoapHeader" use="literal"> </soap:header>
+                <soap:body parts="createLedgerPeriodRequest" use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="createLedgerPeriodResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="createLedgerPeriodFault">
+                <soap:fault name="createLedgerPeriodFault" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="ledgerConfirmation">
+            <soap:operation soapAction=""/>
+            <wsdl:input name="ledgerConfirmationRequest">
+                <soap:header message="tns:ledgerConfirmationRequest" part="SoapHeader" use="literal"> </soap:header>
+                <soap:body parts="ledgerConfirmationRequest" use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="ledgerConfirmationResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="ledgerConfirmationFault">
+                <soap:fault name="ledgerConfirmationFault" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="newLedgerPeriod">
+            <soap:operation soapAction=""/>
+            <wsdl:input name="newLedgerPeriodRequest">
+                <soap:header message="tns:newLedgerPeriodRequest" part="SoapHeader" use="literal"> </soap:header>
+                <soap:body parts="newLedgerPeriodRequest" use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="newLedgerPeriodResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="newLedgerPeriodFault">
+                <soap:fault name="newLedgerPeriodFault" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="listLedgerInformation">
+            <soap:operation soapAction=""/>
+            <wsdl:input name="listLedgerInformationRequest">
+                <soap:header message="tns:listLedgerInformationRequest" part="SoapHeader" use="literal"> </soap:header>
+                <soap:body parts="listLedgerInformationRequest" use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="listLedgerInformationResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="listLedgerInformationFault">
+                <soap:fault name="listLedgerInformationFault" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="balanceSynchronizationFromLedger">
+            <soap:operation soapAction=""/>
+            <wsdl:input name="balanceSynchronizationFromLedgerRequest">
+                <soap:header message="tns:balanceSynchronizationFromLedgerRequest" part="SoapHeader" use="literal"> </soap:header>
+                <soap:body parts="balanceSynchronizationFromLedgerRequest" use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="balanceSynchronizationFromLedgerResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="balanceSynchronizationFromLedgerFault">
+                <soap:fault name="balanceSynchronizationFromLedgerFault" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="deleteConfirmationPostedInLedger">
+            <soap:operation soapAction=""/>
+            <wsdl:input name="deleteConfirmationPostedInLedgerRequest">
+                <soap:header message="tns:deleteConfirmationPostedInLedgerRequest" part="SoapHeader" use="literal"> </soap:header>
+                <soap:body parts="deleteConfirmationPostedInLedgerRequest" use="literal"/>
+            </wsdl:input>
+            <wsdl:output name="deleteConfirmationPostedInLedgerResponse">
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="deleteConfirmationPostedInLedgerFault">
+                <soap:fault name="deleteConfirmationPostedInLedgerFault" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="FNDSLedgerSyncService_V1.0">
+        <wsdl:port binding="tns:FNDSLedgerSyncService_V1.0PortTypeSoap11" name="FNDSLedgerSyncService_V1.0PortTypeSoap11">
+            <soap:address location="http://10.246.89.106:22961/fundscheck/services/FNDSLedgerSyncService_V10"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>
