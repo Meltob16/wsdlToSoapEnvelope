@@ -134,12 +134,12 @@ class WsdlService {
                 numberOfOpenTags++
                 previousStartTagIndex = tempString.indexOf(startTag, previousStartTagIndex +5)
                 if(previousStartTagIndex == -1) {
-                    previousStartTagIndex = 99999
+                    previousStartTagIndex = 999999999
                 }
             }
 
             if (numberOfOpenTags == 0) {
-                val complexType = tempString.substring(tempString.indexOf(startTag), tempString.indexOf(endTag, previousEndTagIndex))
+                val complexType = tempString.substring(tempString.indexOf(startTag), tempString.indexOf(endTag, previousEndTagIndex + 1) + endTag.length)
                 tempString = tempString.replace(complexType, "") // cut out complexType string
                 println(complexType)
                 break
@@ -164,7 +164,7 @@ class WsdlService {
         }
     }
     fun endTagIsBeforeNextStartTag(tempString: String, endTag: String, startTag: String, previousStartTagIndex: Int) =
-        (tempString.indexOf(endTag) < tempString.indexOf(startTag, previousStartTagIndex)) or (tempString.indexOf(startTag) == -1)
+        (tempString.indexOf(endTag) < tempString.indexOf(startTag, previousStartTagIndex)) or (tempString.indexOf(startTag, previousStartTagIndex + 1) == -1)
 
     fun OpenIsNext(numberOfOpenTags: Int, tempString: String, startTag: String, previousStartTagIndex: Int, endTag: String) =
         (tempString.indexOf(startTag, previousStartTagIndex) < tempString.indexOf(endTag))
