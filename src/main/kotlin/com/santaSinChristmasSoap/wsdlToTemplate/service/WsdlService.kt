@@ -10,6 +10,7 @@ class WsdlService {
     var soapEnvelope: String = ""
     var endpoints: MutableList<String> = Collections.emptyList()
     var mergePoint: Int = 0
+    var complexTypes: MutableList<String> = Collections.emptyList()
 
     fun wsdlToTemplate(wsdl: String): String? {
         soapEnvelope = wsdl
@@ -123,28 +124,37 @@ class WsdlService {
     fun getComplexTypes(startTag: String, endTag: String, name: String = "") {
         var tempString = soapEnvelope
         var numberOfOpenTags = 0
-        var previousEndTagIndex = tempString.indexOf(endTag)
         var previousStartTagIndex = tempString.indexOf(startTag)
+        var previousEndTagIndex = tempString.indexOf(endTag)
 
         while (tempString.contains(endTag)) {
-            if (endTagIsBeforeNextStartTag(tempString, endTag, startTag, previousStartTagIndex) and (numberOfOpenTags != 0)) {
-                numberOfOpenTags--
-                previousEndTagIndex = tempString.indexOf(endTag, previousEndTagIndex)
-            } else if (OpenIsNext(numberOfOpenTags, tempString, startTag, previousStartTagIndex, endTag)) {
-                numberOfOpenTags++
-                previousStartTagIndex = tempString.indexOf(startTag, previousStartTagIndex +5)
-                if(previousStartTagIndex == -1) {
-                    previousStartTagIndex = 999999999
-                }
-            }
+            previousStartTagIndex = tempString.indexOf(startTag)
+            previousEndTagIndex = tempString.indexOf(endTag)
 
-            if (numberOfOpenTags == 0) {
-                val complexType = tempString.substring(tempString.indexOf(startTag), tempString.indexOf(endTag, previousEndTagIndex + 1) + endTag.length)
+            // only one open case
+            if(tempString.indexOf(startTag, previousStartTagIndex + 1) > previousEndTagIndex || (tempString.indexOf(startTag, previousStartTagIndex + 1) == -1)) {
+                val complexType = tempString.substring(tempString.indexOf(startTag), tempString.indexOf(endTag, previousEndTagIndex) + endTag.length)
+//                complexTypes.add(complexType)
                 tempString = tempString.replace(complexType, "") // cut out complexType string
                 println(complexType)
-                break
             }
 
+            // more than one open case
+            else if (nextOpenIsBeforeClose(tempString, startTag, previousStartTagIndex, previousEndTagIndex)) {
+                while((nextOpenIsBeforeClose(tempString, startTag, previousStartTagIndex, previousEndTagIndex) and (previousStartTagIndex != -1))) {
+                    numberOfOpenTags++
+                    previousStartTagIndex = tempString.indexOf(startTag, previousStartTagIndex + 1)
+                }
+                while (numberOfOpenTags != 0) {
+                    numberOfOpenTags--
+                    previousEndTagIndex = tempString.indexOf(endTag, previousEndTagIndex + 1)
+                }
+
+                val complexType = tempString.substring(tempString.indexOf(startTag), tempString.indexOf(endTag, previousEndTagIndex) + endTag.length + 1)
+//                complexTypes.add(complexType)
+                tempString = tempString.replace(complexType, "")
+                println(complexType)
+            }
 //            val endTagIndex = tempString.indexOf(endTag) + endTag.length
 //
 //            if (tempString.contains(startTag)) {
@@ -163,11 +173,9 @@ class WsdlService {
             //}
         }
     }
-    fun endTagIsBeforeNextStartTag(tempString: String, endTag: String, startTag: String, previousStartTagIndex: Int) =
-        (tempString.indexOf(endTag) < tempString.indexOf(startTag, previousStartTagIndex)) or (tempString.indexOf(startTag, previousStartTagIndex + 1) == -1)
 
-    fun OpenIsNext(numberOfOpenTags: Int, tempString: String, startTag: String, previousStartTagIndex: Int, endTag: String) =
-        (tempString.indexOf(startTag, previousStartTagIndex) < tempString.indexOf(endTag))
+    private fun nextOpenIsBeforeClose(tempString: String, startTag: String, previousStartTagIndex: Int, previousEndTagIndex: Int) =
+        tempString.indexOf(startTag, previousStartTagIndex + 1) < previousEndTagIndex || tempString.indexOf(startTag, previousStartTagIndex + 1) == -1
 
 //    fun createComplexTypes() { // TODO make list of all complex types
 //        //make list of all complex type names
