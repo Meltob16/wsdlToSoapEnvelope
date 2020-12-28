@@ -10,11 +10,11 @@ class WsdlService {
     var soapEnvelope: String = ""
     var endpoints: MutableList<String> = Collections.emptyList()
     var mergePoint: Int = 0
-    var complexTypes: MutableList<String> = Collections.emptyList()
+    var complexTypes: MutableList<String> = mutableListOf()
 
     fun wsdlToTemplate(wsdl: String): String? {
         soapEnvelope = wsdl
-
+        createListOfComplexTypeNames()
 //        removeIrrelevantInformation()
 //        endpoints = createListContainingAllEndpoints()
 //        while (soapEnvelope.contains("<xs:complexType") or soapEnvelope.contains("</xs:complexType>")) {
@@ -24,6 +24,9 @@ class WsdlService {
 //            removeComplexTypes("<xsd:complexType", "</xsd:complexType>")
 //        }
         getComplexTypes("<xs:complexType", "</xs:complexType")
+        getComplexTypes("<xsd:complexType", "</xsd:complexType")
+        getListOfElementsFromComplexType("EDBHeaderType")
+
 //        createOpeningString()
 
         return soapEnvelope
@@ -106,7 +109,7 @@ class WsdlService {
         val version = soapEnvelope.substring(index, quotationIndex + 1)
         openingString += version
 
-        val urns = createListFromRegexPattern("xmlns:sch[0-9]=\"(.*?)[\"]")
+        val urns = createListFromRegexPattern("xmlns:sch[0-9]=\"(.*?)[\"]", 1)
 
         urns.forEachIndexed { index, element ->
             openingString += " xlmns:urn$index=\"$element\"" //TODO match sch number with urn number
@@ -134,14 +137,13 @@ class WsdlService {
             // only one open case
             if(tempString.indexOf(startTag, previousStartTagIndex + 1) > previousEndTagIndex || (tempString.indexOf(startTag, previousStartTagIndex + 1) == -1)) {
                 val complexType = tempString.substring(tempString.indexOf(startTag), tempString.indexOf(endTag, previousEndTagIndex) + endTag.length)
-//                complexTypes.add(complexType)
+                complexTypes.add(complexType)
                 tempString = tempString.replace(complexType, "") // cut out complexType string
-                println(complexType)
             }
 
             // more than one open case
             else if (nextOpenIsBeforeClose(tempString, startTag, previousStartTagIndex, previousEndTagIndex)) {
-                while((nextOpenIsBeforeClose(tempString, startTag, previousStartTagIndex, previousEndTagIndex) and (previousStartTagIndex != -1))) {
+                while((tempString.indexOf(startTag, previousStartTagIndex + 1) != -1) and (nextOpenIsBeforeClose(tempString, startTag, previousStartTagIndex, previousEndTagIndex))) {
                     numberOfOpenTags++
                     previousStartTagIndex = tempString.indexOf(startTag, previousStartTagIndex + 1)
                 }
@@ -151,9 +153,8 @@ class WsdlService {
                 }
 
                 val complexType = tempString.substring(tempString.indexOf(startTag), tempString.indexOf(endTag, previousEndTagIndex) + endTag.length + 1)
-//                complexTypes.add(complexType)
+                complexTypes.add(complexType)
                 tempString = tempString.replace(complexType, "")
-                println(complexType)
             }
 //            val endTagIndex = tempString.indexOf(endTag) + endTag.length
 //
@@ -175,7 +176,7 @@ class WsdlService {
     }
 
     private fun nextOpenIsBeforeClose(tempString: String, startTag: String, previousStartTagIndex: Int, previousEndTagIndex: Int) =
-        tempString.indexOf(startTag, previousStartTagIndex + 1) < previousEndTagIndex || tempString.indexOf(startTag, previousStartTagIndex + 1) == -1
+        tempString.indexOf(startTag, previousStartTagIndex + 1) < previousEndTagIndex
 
 //    fun createComplexTypes() { // TODO make list of all complex types
 //        //make list of all complex type names
@@ -210,16 +211,25 @@ class WsdlService {
 //        // TODO sjekke typen til et element, hvis det er complextype, kjøre metopde for å lage soap mal av complextype
 //    }
 
-    fun createListFromRegexPattern(startPattern: String): List<String> {
-        val schRegex = Regex(startPattern)
-        return schRegex.findAll(soapEnvelope)
+    fun createListFromRegexPattern(startPattern: String, regexTarget: Int): List<String> {
+        val regex = Regex(startPattern)
+        return regex.findAll(soapEnvelope)
             .toList()
-            .map { it.groupValues[1] }
+            .map { it.groupValues[regexTarget] }
             .distinct()
     }
 
-    fun testingGetListFromElements() {
-        val list = createListFromRegexPattern("<xsd:element name=\"(.*?)\" type=\"(.*?)\"")
+    fun getListOfElementsFromComplexType(complexType: String) {
+        val test = complexTypes.find { it.contains(complexType) }
+        println(test)
+        val list = createListFromRegexPattern("<xsd:element name=\"(.*?)\" type=\"(.*?)\"", 1)
+
+        val mapOfNameAndType = mapOf<>()
+        list.forEach(System.out::println)
+    }
+
+    fun createListOfComplexTypeNames() {
+        val list = createListFromRegexPattern("<(xsd|xs):complexType.* name=\"(.*?)\"", 2)
 
         list.forEach(System.out::println)
     }
