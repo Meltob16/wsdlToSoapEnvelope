@@ -12,12 +12,14 @@ class WsdlService {
     var endpoints: MutableList<String> = Collections.emptyList()
     var mergePoint: Int = 0
     var complexTypes: MutableList<String> = mutableListOf()
+    var simpleTypeNames: List<String> = Collections.emptyList()
     var complexTypeNames: List<String> = Collections.emptyList()
 
 
     fun operationToSoapTemplate(operation: String): String? {
-
+        wsdlInput = operation
         createListOfComplexTypeNames()
+        createListOfSimpleTypeNames()
 //        removeIrrelevantInformation()
 //        endpoints = createListContainingAllEndpoints()
 //        while (soapEnvelope.contains("<xs:complexType") or soapEnvelope.contains("</xs:complexType>")) {
@@ -28,8 +30,8 @@ class WsdlService {
 //        }
 
         createOpeningString()
-        getComplexTypes("<xs:complexType", "</xs:complexType")
-        getComplexTypes("<xsd:complexType", "</xsd:complexType")
+        getContentOfTag("<xs:complexType", "</xs:complexType")
+        getContentOfTag("<xsd:complexType", "</xsd:complexType")
         getListOfElementsFromComplexType("EDBHeaderType")
         getListOfElementsFromComplexType("ledgerConfirmationRequest")
 
@@ -42,7 +44,7 @@ class WsdlService {
         wsdlInput = wsdl
         endpoints = createListContainingAllEndpoints()
         var responseObject = JSONObject()
-        endpoints.forEachIndexed{index, element ->
+        endpoints.forEachIndexed { index, element ->
             responseObject[index.toString()] = element
         }
         println(responseObject)
@@ -142,7 +144,9 @@ class WsdlService {
         val endIndex = wsdlInput.indexOf("</xsd:complexType>")
     }
 
-    fun getComplexTypes(startTag: String, endTag: String, name: String = "") {
+    fun getContentOfTag(startTag: String, endTag: String, name: String = ""): MutableList<String> {
+//        var : MutableList<String> = mutableListOf()
+
         var tempString = wsdlInput
         var numberOfOpenTags = 0
         var previousStartTagIndex = tempString.indexOf(startTag)
@@ -236,15 +240,33 @@ class WsdlService {
 
     fun getListOfElementsFromComplexType(complexType: String) {
         var searchWord = "<xs:complexType name=\"$complexType\""
-        var complexTypeText = complexTypes.find { it.contains(searchWord) }
+        var complexTypeText = getContentOfTag.find { it.contains(searchWord) }
         if (complexTypeText == null) {
             searchWord = "<xsd:complexType name=\"$complexType\""
-            complexTypeText = complexTypes.find { it.contains(searchWord) }
+            complexTypeText = getContentOfTag.find { it.contains(searchWord) }
         }
 
         val mapOfNameAndType = createMapFromRegexPattern("<(xsd|xs):(element|attribute).* name=\"(.*?)\".* type=\"(.*?)\"", complexTypeText)
+        val libSearch = Regex("<(xsd|xs):(element|attribute).* name=\"(.*?)\".* type=\"(.*?)\"")
         mapOfNameAndType.forEach {
-            if (isComplex(it.value)) {
+            var typeNameWithRemovedColon = ""
+
+            if (it.value.contains(":")) {
+                typeNameWithRemovedColon = removeNamePrefix(it.value)
+                println("removedColon: " + typeNameWithRemovedColon)
+                if (isSimple(typeNameWithRemovedColon)) {
+                    soapEnvelope += "<wsc:${it.key}> simpleType: $typeNameWithRemovedColon </wsc:${it.key}>\n"
+
+                } else if (isComplex(typeNameWithRemovedColon)) {
+                    soapEnvelope += "<wsc:$typeNameWithRemovedColon>\n"
+                    getListOfElementsFromComplexType(typeNameWithRemovedColon)
+                    soapEnvelope += "</wsc:$typeNameWithRemovedColon>\n"
+                } else {
+                    createHeaderTags(it.key)
+                }
+            } else if (isSimple(it.value)) {
+                soapEnvelope += "<wsc:${it.key}> simpleType: ${it.value} </wsc:${it.key}>\n"
+            } else if (isComplex(it.value)) {
                 val nameTag = it.value
                 soapEnvelope += "<wsc:$nameTag>\n"
                 getListOfElementsFromComplexType(it.value)
@@ -252,11 +274,13 @@ class WsdlService {
             } else {
                 createHeaderTags(it.key)
             }
+
+
         }
 //TODO add these </wsc:AutHeader>
 //    </soapenv:Header>
 //    <soapenv:Body>   before next section
-
+        simpleTypeNames.forEach(System.out::println)
         println(soapEnvelope)
     }
 
@@ -264,8 +288,21 @@ class WsdlService {
         complexTypeNames = createDistinctListFromRegexPattern("<(xsd|xs):complexType.* name=\"(.*?)\"", 2)
     }
 
+    fun createListOfSimpleTypeNames() {
+        simpleTypeNames = createDistinctListFromRegexPattern("<(xsd|xs):simpleType.* name=\"(.*?)\"", 2)
+
+    }
+
     fun isComplex(type: String): Boolean =
             (complexTypeNames.contains(type))
+
+    fun isSimple(type: String): Boolean =
+            (simpleTypeNames.contains(type))
+
+    fun removeNamePrefix(type: String): String {
+        val colonIndex = type.indexOf(":")
+        return type.removeRange(0, colonIndex + 1)
+    }
 
     fun extractSpecifiedEndpoint(): String {
         return wsdlInput

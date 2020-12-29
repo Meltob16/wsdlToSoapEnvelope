@@ -21,10 +21,10 @@ class RestController(
 
     @RequestMapping(method = [RequestMethod.GET], headers = ["Accept=*/*"])
     @ResponseBody
-    fun getWsdl(httpEntity: HttpEntity<String>): String {
+    fun getWsdl(httpEntity: HttpEntity<String>): String? {
         val body = httpEntity.body
 
-        return wsdlService.returnOperations(body.toString())
+        return wsdlService.operationToSoapTemplate(body.toString())
     }
 
 }
