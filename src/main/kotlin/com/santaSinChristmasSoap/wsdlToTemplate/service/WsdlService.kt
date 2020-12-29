@@ -1,5 +1,6 @@
 package com.santaSinChristmasSoap.wsdlToTemplate.service
 
+import net.minidev.json.JSONObject
 import org.springframework.stereotype.Service
 import java.util.*
 
@@ -14,8 +15,8 @@ class WsdlService {
     var complexTypeNames: List<String> = Collections.emptyList()
 
 
-    fun wsdlToTemplate(wsdl: String): String? {
-        wsdlInput = wsdl
+    fun operationToSoapTemplate(operation: String): String? {
+
         createListOfComplexTypeNames()
 //        removeIrrelevantInformation()
 //        endpoints = createListContainingAllEndpoints()
@@ -25,7 +26,7 @@ class WsdlService {
 //        while (soapEnvelope.contains("<xsd:complexType") or soapEnvelope.contains("</xs:complexType>")) {
 //            removeComplexTypes("<xsd:complexType", "</xsd:complexType>")
 //        }
-        createListContainingAllEndpoints()
+
         createOpeningString()
         getComplexTypes("<xs:complexType", "</xs:complexType")
         getComplexTypes("<xsd:complexType", "</xsd:complexType")
@@ -35,6 +36,18 @@ class WsdlService {
 //        createOpeningString()
 
         return wsdlInput
+    }
+
+    fun returnOperations(wsdl: String): String {
+        wsdlInput = wsdl
+        endpoints = createListContainingAllEndpoints()
+        var responseObject = JSONObject()
+        endpoints.forEachIndexed{index, element ->
+            responseObject[index.toString()] = element
+        }
+        println(responseObject)
+
+        return responseObject.toString()
     }
 
     fun removeIrrelevantInformation() {
@@ -181,7 +194,7 @@ class WsdlService {
     }
 
     private fun nextOpenIsBeforeClose(tempString: String, startTag: String, previousStartTagIndex: Int, previousEndTagIndex: Int) =
-        tempString.indexOf(startTag, previousStartTagIndex + 1) < previousEndTagIndex
+            tempString.indexOf(startTag, previousStartTagIndex + 1) < previousEndTagIndex
 
 //    fun createComplexTypes() { // TODO make list of all complex types
 //        //make list of all complex type names
@@ -208,23 +221,23 @@ class WsdlService {
     fun createDistinctListFromRegexPattern(startPattern: String, regexTarget: Int): List<String> {
         val regex = Regex(startPattern)
         return regex.findAll(wsdlInput)
-            .toList()
-            .map { it.groupValues[regexTarget] }
-            .distinct()
+                .toList()
+                .map { it.groupValues[regexTarget] }
+                .distinct()
     }
 
     fun createMapFromRegexPattern(startPattern: String, complexTypeText: String?): Map<String, String> {
         val regex = Regex(startPattern)
         return regex.findAll(complexTypeText ?: "")
-            .toList()
-            .map { it.groupValues[3] to it.groupValues[4] }
-            .toMap()
+                .toList()
+                .map { it.groupValues[3] to it.groupValues[4] }
+                .toMap()
     }
 
     fun getListOfElementsFromComplexType(complexType: String) {
         var searchWord = "<xs:complexType name=\"$complexType\""
         var complexTypeText = complexTypes.find { it.contains(searchWord) }
-        if(complexTypeText == null) {
+        if (complexTypeText == null) {
             searchWord = "<xsd:complexType name=\"$complexType\""
             complexTypeText = complexTypes.find { it.contains(searchWord) }
         }
@@ -252,13 +265,13 @@ class WsdlService {
     }
 
     fun isComplex(type: String): Boolean =
-        (complexTypeNames.contains(type))
+            (complexTypeNames.contains(type))
 
     fun extractSpecifiedEndpoint(): String {
         return wsdlInput
     }
 
-    fun addUrns(){
+    fun addUrns() {
         //TODO
 
     }
