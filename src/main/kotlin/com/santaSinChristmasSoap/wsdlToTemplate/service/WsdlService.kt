@@ -120,7 +120,7 @@ class WsdlService {
     }
 
     fun createOpeningString() {
-        var openingString = """xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:wsc="http://edb.com/ws/WSCommon"""
+        var openingString = """<xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:wsc="http://edb.com/ws/WSCommon"""
 
         val index = wsdlInput.indexOf("""xmlns="http://edb.com/ws/WSCommon""") + """xmlns="http://edb.com/ws/WSCommon""".length
         val quotationIndex = wsdlInput.indexOf("\"", index)
