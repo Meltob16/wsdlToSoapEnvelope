@@ -24,6 +24,15 @@ class RestController(
     fun getWsdl(httpEntity: HttpEntity<String>): String? {
         val body = httpEntity.body
 
+        return wsdlService.returnOperations(body.toString())
+    }
+
+
+    @RequestMapping(method = [RequestMethod.GET], headers = ["Accept=*/*"])
+    @ResponseBody
+    fun getOperationTarget(httpEntity: HttpEntity<String>): String? {
+        val body = httpEntity.body
+
         return wsdlService.operationToSoapTemplate(body.toString())
     }
 

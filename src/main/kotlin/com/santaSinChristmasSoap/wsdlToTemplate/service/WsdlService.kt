@@ -20,7 +20,7 @@ class WsdlService {
 
     fun operationToSoapTemplate(operation: String): String? {
         wsdlInput = operation
-
+        soapEnvelope = ""
         complexTypes = getContentOfTag("<xs:complexType", "</xs:complexType")
         complexTypes.addAll(getContentOfTag("<xsd:complexType", "</xsd:complexType"))
         messagesWithContent = getContentOfTag("<wsdl:message", "</wsdl:message>")
@@ -132,7 +132,7 @@ class WsdlService {
         urns.forEachIndexed { index, element ->
             openingString += " xlmns:urn$index=\"$element\"" //TODO match sch number with urn number
         }
-        openingString += ">\n<soapenv:Header>\n<wsc:AutHeader>"
+        openingString += ">\n<soapenv:Header>"
 
         soapEnvelope += openingString
     }
@@ -217,8 +217,8 @@ class WsdlService {
 //
 //    }
 
-    fun createHeaderTags(element: String) {
-        soapEnvelope += "<wsc:$element>$element</wsc:$element>\n"
+    fun createHeaderTags(element: String, tagPrefix: String) {
+        soapEnvelope += "<$tagPrefix:$element>$element</$tagPrefix:$element>\n"
     }
 
     fun createDistinctListFromRegexPattern(startPattern: String, regexTarget: Int): List<String> {
@@ -245,7 +245,11 @@ class WsdlService {
                 .toMap()
     }
 
-    fun getListOfElementsFromComplexType(complexType: String) {
+    fun getListOfElementsFromComplexType(complexType: String, headerOrBody: Int) {
+        var tagPrefix = "urn"
+        if (headerOrBody == 0) {
+            tagPrefix = "wsc"
+        }
         var searchWord = "<xs:complexType name=\"$complexType\""
         var complexTypeText = complexTypes.find { it.contains(searchWord) }
         if (complexTypeText == null) {
@@ -261,37 +265,34 @@ class WsdlService {
             if (it.value.contains(":")) {
                 typeNameWithRemovedColon = removeNamePrefix(it.value)
                 if (isSimple(typeNameWithRemovedColon)) {
-                    soapEnvelope += "<wsc:${it.key}> simpleType: $typeNameWithRemovedColon </wsc:${it.key}>\n"
+                    soapEnvelope += "<$tagPrefix:${it.key}> simpleType: $typeNameWithRemovedColon </$tagPrefix:${it.key}>\n"
 
                 } else if (isComplex(typeNameWithRemovedColon)) {
-                    soapEnvelope += "<wsc:$typeNameWithRemovedColon>\n"
-                    getListOfElementsFromComplexType(typeNameWithRemovedColon)
-                    soapEnvelope += "</wsc:$typeNameWithRemovedColon>\n"
+                    soapEnvelope += "<$tagPrefix:${it.key}>\n"
+                    getListOfElementsFromComplexType(typeNameWithRemovedColon, headerOrBody)
+                    soapEnvelope += "</$tagPrefix:${it.key}>\n"
                 } else {
-                    createHeaderTags(it.key)
+                    createHeaderTags(it.key, tagPrefix)
                 }
             } else if (isSimple(it.value)) {
-                soapEnvelope += "<wsc:${it.key}> simpleType: ${it.value} </wsc:${it.key}>\n"
+                soapEnvelope += "<$tagPrefix:${it.key}> simpleType: ${it.value} </$tagPrefix:${it.key}>\n"
             } else if (isComplex(it.value)) {
-                val nameTag = it.value
-                soapEnvelope += "<wsc:$nameTag>\n"
-                getListOfElementsFromComplexType(it.value)
-                soapEnvelope += "</wsc:$nameTag>\n"
+                val nameTag = it.key
+                soapEnvelope += "<$tagPrefix:$nameTag>\n"
+                getListOfElementsFromComplexType(it.value, headerOrBody)
+                soapEnvelope += "</$tagPrefix:$nameTag>\n"
             } else {
-                createHeaderTags(it.key)
+                createHeaderTags(it.key, tagPrefix)
             }
 
 
         }
-//TODO add these </wsc:AutHeader>
-//    </soapenv:Header>
-//    <soapenv:Body>   before next section
     }
 
     fun findOperationInput(operationName: String): String? {
         val operationSearchString = "<wsdl:operation name=\"$operationName\""
-        var operation = operationsWithContent.find { it.contains(operationSearchString) }
-        var messageName = createDistinctListFromRegexPattern("<wsdl:input(.*?)name=\"(.*?)\"", 2, operation)
+        val operation = operationsWithContent.find { it.contains(operationSearchString) }
+        val messageName = createDistinctListFromRegexPattern("<wsdl:input(.*?)name=\"(.*?)\"", 2, operation)
         return messageName.first().toString()
 
     }
@@ -301,9 +302,9 @@ class WsdlService {
 
 
         val messageSearchString = "<wsdl:message name=\"$messageName\""
-        var message = messagesWithContent.find { it.contains(messageSearchString) }
-        var elementsOfMessage = createDistinctListFromRegexPattern("<wsdl:part element=\"(.*?)\"", 1, message)
-        var elementsOfMessageNoColon: MutableList<String> = mutableListOf()
+        val message = messagesWithContent.find { it.contains(messageSearchString) }
+        val elementsOfMessage = createDistinctListFromRegexPattern("<wsdl:part element=\"(.*?)\"", 1, message)
+        val elementsOfMessageNoColon: MutableList<String> = mutableListOf()
         elementsOfMessage.forEach { element ->
             if (element.contains(":")) {
                 elementsOfMessageNoColon.add(removeNamePrefix(element))
@@ -316,7 +317,7 @@ class WsdlService {
             }
         }
 
-        var mapOfMessage: MutableMap<String, String> = mutableMapOf()
+        val mapOfMessage: MutableMap<String, String> = mutableMapOf()
         elementsOfMessageNoColon.forEach { element ->
             mapOfMessage[element] = allElementsAndTypesMutable[element] ?: ""
         }
@@ -326,10 +327,16 @@ class WsdlService {
 
     fun createSoapFromMessage(message: MutableMap<String, String>) {
         var count = 0
+        var tagPrefix = "wsc"
         message.forEach { key, value ->
-            getListOfElementsFromComplexType(value) // TODO send in counter så man vet om det er wsc eller urn
+            if (count == 1) {
+                tagPrefix = "urn"
+            }
+            soapEnvelope += "<$tagPrefix:$key>"
+            getListOfElementsFromComplexType(value, count)
+            soapEnvelope += "</$tagPrefix:$key>"
             if (count == 0) {
-                soapEnvelope += "</soapenv:Header>\n <soapenv:Body>"
+                soapEnvelope += "\n </soapenv:Header>\n <soapenv:Body>"
                 count++
             }
         }
