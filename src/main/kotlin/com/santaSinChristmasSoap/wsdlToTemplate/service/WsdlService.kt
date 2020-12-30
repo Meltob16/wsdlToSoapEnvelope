@@ -19,34 +19,22 @@ class WsdlService {
     var allElementsAndTypesMutable: MutableMap<String, String> = mutableMapOf()
 
     fun operationToSoapTemplate(operation: String): String? {
-        wsdlInput = operation
-        soapEnvelope = ""
-        complexTypes = getContentOfTag("<xs:complexType", "</xs:complexType")
-        complexTypes.addAll(getContentOfTag("<xsd:complexType", "</xsd:complexType"))
-        messagesWithContent = getContentOfTag("<wsdl:message", "</wsdl:message>")
-        operationsWithContent = getContentOfTag("<wsdl:operation", "</wsdl:operation>")
-        createListOfComplexTypeNames()
-        createListOfSimpleTypeNames()
-
-
+        //  wsdlInput = operation
+        getDocumentInformation()
         createOpeningString()
-
-        createSoapFromMessage(createListOfMessagesWithElementMaps(findOperationInput("ledgerConfirmation")))
-
-
+        createSoapFromMessage(createListOfMessagesWithElementMaps(findOperationInput(operation)))
 
         return soapEnvelope
     }
 
     fun returnOperations(wsdl: String): String {
         wsdlInput = wsdl
-        endpoints = createListContainingAllEndpoints()
+        endpoints = createDistinctListFromRegexPattern("<wsdl:operation.* name=\"(.*?)\">", 1).toMutableList() //createListContainingAllEndpoints()
         var responseObject = JSONObject()
         endpoints.forEachIndexed { index, element ->
             responseObject[index.toString()] = element
         }
         println(responseObject)
-
         return responseObject.toString()
     }
 
@@ -66,6 +54,18 @@ class WsdlService {
         }
     }
 
+    fun getDocumentInformation() {
+        soapEnvelope = ""
+        complexTypes = getContentOfTag("<xs:complexType", "</xs:complexType")
+        complexTypes.addAll(getContentOfTag("<xsd:complexType", "</xsd:complexType"))
+        messagesWithContent = getContentOfTag("<wsdl:message", "</wsdl:message>")
+        operationsWithContent = getContentOfTag("<wsdl:operation", "</wsdl:operation>")
+        createListOfComplexTypeNames()
+        createListOfSimpleTypeNames()
+
+    }
+
+
     fun createListContainingAllEndpoints(): MutableList<String> { // removes operation tags
         val endpoints = mutableListOf<String>()
 
@@ -81,7 +81,7 @@ class WsdlService {
             val name = wsdlInput.substring(startIndex, lastIndexOfName)
             if (!endpoints.contains(name)) endpoints.add(name)
 
-            // removeTagAndBody("<wsdl:operation name=\"", "</wsdl:operation>")
+            removeTagAndBody("<wsdl:operation name=\"", "</wsdl:operation>")
         }
         endpoints.forEach(System.out::println)
         return endpoints

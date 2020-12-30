@@ -1,14 +1,9 @@
 package com.santaSinChristmasSoap.wsdlToTemplate.api
 
-import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.databind.util.JSONPObject
 import com.santaSinChristmasSoap.wsdlToTemplate.service.WsdlService
-import net.minidev.json.JSONObject
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpEntity
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestMethod
-import org.springframework.web.bind.annotation.ResponseBody
+import org.springframework.web.bind.annotation.*
 import org.springframework.web.bind.annotation.RestController
 
 
@@ -28,12 +23,12 @@ class RestController(
     }
 
 
-    @RequestMapping(method = [RequestMethod.GET], headers = ["Accept=*/*"])
+    @RequestMapping(value = ["/chooseOperation/{operation}"], method = [RequestMethod.GET], headers = ["Accept=*/*"])
     @ResponseBody
-    fun getOperationTarget(httpEntity: HttpEntity<String>): String? {
-        val body = httpEntity.body
+    fun getOperationTarget(@PathVariable("operation") operation: String): String? {
 
-        return wsdlService.operationToSoapTemplate(body.toString())
+
+        return wsdlService.operationToSoapTemplate(operation)
     }
 
 }
