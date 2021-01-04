@@ -8,7 +8,7 @@ export class WsdlForm extends Component {
         super(props);
         this.state = {
             value: 'Insert WSDL',
-            response: ''
+            response: []
         };
 
 
@@ -33,30 +33,26 @@ export class WsdlForm extends Component {
             )
             .then(r => {
                 this.setState({response: r.data});
+                console.log(r.data)
             })
             .catch(e => console.log(e));
+
     }
 
 
     render() {
-        const { operations } = this.state
+        
         return (
-
+            <div>
+            <div>{this.state.response}</div>
             <form onSubmit={this.handleSubmit}>
-                <div>
-                list of operations {
-                operations.length ?
-                operations.map(operation => <div> {operation.response} </div>) :
-                null
-            }
-                </div>
-
                 <label>
+                    
                     <textarea value={this.state.value} onChange={this.handleChange}/>
                 </label>
                 <input type="submit" value="Submit WSDL" className="button"/>
             </form>
-
+            </div>
         );
     }
 }
