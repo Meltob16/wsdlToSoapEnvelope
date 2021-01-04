@@ -10,16 +10,18 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("wsdlToTemplate")
 class RestController(
-        @Autowired
-        val wsdlService: WsdlService
+    @Autowired
+    val wsdlService: WsdlService
 ) {
 
-    @RequestMapping(method = [RequestMethod.GET], headers = ["Accept=*/*"])
+    @CrossOrigin(origins = ["http://localhost:3000"], allowedHeaders = ["*"])
+    @RequestMapping(method = [RequestMethod.PUT], headers = ["Accept=*/*"])
     @ResponseBody
     fun getWsdl(httpEntity: HttpEntity<String>): String? {
-        val body = httpEntity.body
+        println("body: " + httpEntity.body)
+        var body = httpEntity.body.toString()
 
-        return wsdlService.returnOperations(body.toString())
+        return wsdlService.returnOperations(body)
     }
 
 

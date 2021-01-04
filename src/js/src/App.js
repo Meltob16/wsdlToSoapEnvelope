@@ -1,11 +1,11 @@
 import './App.css';
-import MyComponent from './Components/MyComponent';
+import WsdlPost from './components/WsdlPost';
+import WsdlForm from './components/WsdlForm';
 
 function App() {
   return (
-    <div className="App">
-        <MyComponent />
-    </div>
+      <WsdlForm />
+
   );
 }
 

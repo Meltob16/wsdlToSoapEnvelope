@@ -197,7 +197,7 @@ class WsdlService {
     }
 
     private fun nextOpenIsBeforeClose(tempString: String, startTag: String, previousStartTagIndex: Int, previousEndTagIndex: Int) =
-            tempString.indexOf(startTag, previousStartTagIndex + 1) < previousEndTagIndex
+        tempString.indexOf(startTag, previousStartTagIndex + 1) < previousEndTagIndex
 
 //    fun createComplexTypes() { // TODO make list of all complex types
 //        //make list of all complex type names
@@ -224,25 +224,25 @@ class WsdlService {
     fun createDistinctListFromRegexPattern(startPattern: String, regexTarget: Int): List<String> {
         val regex = Regex(startPattern)
         return regex.findAll(wsdlInput)
-                .toList()
-                .map { it.groupValues[regexTarget] }
-                .distinct()
+            .toList()
+            .map { it.groupValues[regexTarget] }
+            .distinct()
     }
 
     fun createDistinctListFromRegexPattern(startPattern: String, regexTarget: Int, searchText: String?): List<String> {
         val regex = Regex(startPattern)
         return regex.findAll(searchText ?: "")
-                .toList()
-                .map { it.groupValues[regexTarget] }
-                .distinct()
+            .toList()
+            .map { it.groupValues[regexTarget] }
+            .distinct()
     }
 
     fun createMapFromRegexPattern(startPattern: String, complexTypeText: String?): Map<String, String> {
         val regex = Regex(startPattern)
         return regex.findAll(complexTypeText ?: "")
-                .toList()
-                .map { it.groupValues[3] to it.groupValues[4] }
-                .toMap()
+            .toList()
+            .map { it.groupValues[3] to it.groupValues[4] }
+            .toMap()
     }
 
     fun getListOfElementsFromComplexType(complexType: String, headerOrBody: Int) {
@@ -353,10 +353,10 @@ class WsdlService {
     }
 
     fun isComplex(type: String): Boolean =
-            (complexTypeNames.contains(type))
+        (complexTypeNames.contains(type))
 
     fun isSimple(type: String): Boolean =
-            (simpleTypeNames.contains(type))
+        (simpleTypeNames.contains(type))
 
     fun removeNamePrefix(type: String): String {
         val colonIndex = type.indexOf(":")
