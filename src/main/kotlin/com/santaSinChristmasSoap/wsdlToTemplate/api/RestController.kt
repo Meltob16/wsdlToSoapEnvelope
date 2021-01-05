@@ -18,7 +18,7 @@ class RestController(
     @RequestMapping(method = [RequestMethod.GET], headers = ["Accept=*/*"])
     @ResponseBody
     fun getWsdl(httpEntity: HttpEntity<String>): String? {
-        println("body: " + httpEntity.body)
+       // println("body: " + httpEntity.body)
         var body = httpEntity.body.toString()
 
         return wsdlService.returnOperations(body)

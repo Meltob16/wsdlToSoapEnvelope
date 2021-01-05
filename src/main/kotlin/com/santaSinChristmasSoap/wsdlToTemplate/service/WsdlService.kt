@@ -14,8 +14,8 @@ class WsdlService {
     var complexTypes: MutableList<String> = mutableListOf()
     var messagesWithContent: MutableList<String> = mutableListOf()
     var operationsWithContent: MutableList<String> = mutableListOf()
-    var simpleTypeNames: List<String> = Collections.emptyList()
-    var complexTypeNames: List<String> = Collections.emptyList()
+    var simpleTypeNames: MutableList<String> = Collections.emptyList()
+    var complexTypeNames: MutableList<String> = Collections.emptyList()
     var allElementsAndTypesMutable: MutableMap<String, String> = mutableMapOf()
 
     var openingUrns: List<String> = Collections.emptyList()
@@ -27,19 +27,18 @@ class WsdlService {
         getDocumentInformation()
         createOpeningString()
         createSoapFromMessage(createListOfMessagesWithElementMaps(findOperationInput(operation)))
-
         return soapEnvelope
     }
 
     fun returnOperations(wsdl: String): String {
         wsdlInput = wsdl
 
-        endpoints = createDistinctListFromRegexPattern("<wsdl:operation.* name=\"(.*?)\">", 1).toMutableList() //createListContainingAllEndpoints()
+        endpoints = createDistinctListFromRegexPattern("<wsdl:operation.* name=\"(.*?)\">", 1).toMutableList()
         var responseObject = JSONObject()
         endpoints.forEachIndexed { index, element ->
             responseObject[index.toString()] = element
         }
-        println(responseObject)
+        // println(responseObject)
         return responseObject.toString()
     }
 
@@ -63,6 +62,7 @@ class WsdlService {
         soapEnvelope = ""
         complexTypes = getContentOfTag("<xs:complexType", "</xs:complexType")
         complexTypes.addAll(getContentOfTag("<xsd:complexType", "</xsd:complexType"))
+        complexTypes.addAll(getContentOfTag("<complexType", "</complexType"))
         messagesWithContent = getContentOfTag("<wsdl:message", "</wsdl:message>")
         operationsWithContent = getContentOfTag("<wsdl:operation", "</wsdl:operation>")
         createListOfComplexTypeNames()
@@ -88,7 +88,7 @@ class WsdlService {
 
             removeTagAndBody("<wsdl:operation name=\"", "</wsdl:operation>")
         }
-        endpoints.forEach(System.out::println)
+        //   endpoints.forEach(System.out::println)
         return endpoints
     }
 
@@ -243,11 +243,11 @@ class WsdlService {
                 .distinct()
     }
 
-    fun createMapFromRegexPattern(startPattern: String, complexTypeText: String?): Map<String, String> {
+    fun createMapFromRegexPattern(startPattern: String, complexTypeText: String?, grouOne: Int = 3, groupTwo: Int = 4): Map<String, String> {
         val regex = Regex(startPattern)
         return regex.findAll(complexTypeText ?: "")
                 .toList()
-                .map { it.groupValues[3] to it.groupValues[4] }
+                .map { it.groupValues[grouOne] to it.groupValues[groupTwo] }
                 .toMap()
     }
 
@@ -258,17 +258,24 @@ class WsdlService {
             tagPrefix = "wsc"
         }
         var searchWord = "<xs:complexType name=\"$complexType\""
-        var complexTypeText = complexTypes.find { it.contains(searchWord) }
+        var complexTypeText = complexTypes.find { it.contains(searchWord) }  // TODO add for not XS
         if (complexTypeText == null) {
             searchWord = "<xsd:complexType name=\"$complexType\""
             complexTypeText = complexTypes.find { it.contains(searchWord) }
         }
+        if (complexTypeText == null) {
+            searchWord = "<complexType name=\"$complexType\""
+            complexTypeText = complexTypes.find { it.contains(searchWord) }
+        }
 
-        val mapOfNameAndType = createMapFromRegexPattern("<(xsd|xs):(element|attribute).* name=\"(.*?)\".* type=\"(.*?)\"", complexTypeText)
+        var mapOfNameAndType = createMapFromRegexPattern("<(xsd|xs):(element|attribute).* name=\"(.*?)\".* type=\"(.*?)\"", complexTypeText).toMutableMap()
+        mapOfNameAndType.putAll(createMapFromRegexPattern("<(element|attribute).* name=\"(.*?)\".* type=\"(.*?)\"", complexTypeText, 2, 3))
+
         val libSearch = Regex("<(xsd|xs):(element|attribute).* name=\"(.*?)\".* type=\"(.*?)\"")
         mapOfNameAndType.forEach {
             var typeNameWithRemovedColon = ""
             tagNumber = getUrnNumber(it.key)
+            if (tagNumber == "-1") tagNumber = "could not find urn / schema"
             if (headerOrBody == 0) {
                 tagNumber = ""
             }
@@ -292,7 +299,7 @@ class WsdlService {
                 getListOfElementsFromComplexType(it.value, headerOrBody)
                 soapEnvelope += "</$tagPrefix$tagNumber:$nameTag>\n"
             } else {
-                createHeaderTags(it.key, tagPrefix)
+                createHeaderTags(it.key, tagPrefix + tagNumber)
             }
 
 
@@ -359,17 +366,20 @@ class WsdlService {
     }
 
     fun createListOfComplexTypeNames() {
-        complexTypeNames = createDistinctListFromRegexPattern("<(xsd|xs):complexType.* name=\"(.*?)\"", 2)
+        complexTypeNames = createDistinctListFromRegexPattern("<(xsd|xs):complexType.* name=\"(.*?)\"", 2).toMutableList()
+        complexTypeNames.addAll(createDistinctListFromRegexPattern("<complexType.* name=\"(.*?)\"", 1).toMutableList())
     }
 
     fun createListOfSimpleTypeNames() {
-        simpleTypeNames = createDistinctListFromRegexPattern("<(xsd|xs):simpleType.* name=\"(.*?)\"", 2)
+        simpleTypeNames = createDistinctListFromRegexPattern("<(xsd|xs):simpleType.* name=\"(.*?)\"", 2).toMutableList()
+        simpleTypeNames.addAll(createDistinctListFromRegexPattern("<simpleType.* name=\"(.*?)\"", 1).toMutableList())
 
     }
 
     fun createMapOfSchemasWithNamespace() {
         var listOfSchemas: MutableList<String> = getContentOfTag("<xsd:schema", "</xsd:schema>")
         listOfSchemas.addAll(getContentOfTag("<xs:schema", "</xs:schema>"))
+        listOfSchemas.addAll(getContentOfTag("<schema", "</schema>"))
 
         val regex = Regex("targetNamespace=\"(.*?)\">")
 
@@ -383,7 +393,6 @@ class WsdlService {
             TempAllSchemasWithNamespace[key] = openingUrns.indexOf(value).toString()
         }
         allSchemasWithNamespace = TempAllSchemasWithNamespace
-        //  println(allSchemasWithNamespace)
     }
 
     fun getUrnNumber(name: String): String {
