@@ -30,7 +30,7 @@ class WsdlService {
         return soapEnvelope
     }
 
-    fun returnOperations(wsdl: String): String {
+    fun returnOperations(wsdl: String): MutableList<String> {
         wsdlInput = wsdl
 
         endpoints = createDistinctListFromRegexPattern("<wsdl:operation.* name=\"(.*?)\">", 1).toMutableList()
@@ -38,8 +38,8 @@ class WsdlService {
         endpoints.forEachIndexed { index, element ->
             responseObject[index.toString()] = element
         }
-        // println(responseObject)
-        return responseObject.toString()
+        println(responseObject)
+        return endpoints
     }
 
     fun removeIrrelevantInformation() {

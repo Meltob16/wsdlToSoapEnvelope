@@ -15,17 +15,17 @@ class RestController(
 ) {
 
     @CrossOrigin(origins = ["http://localhost:3000"], allowedHeaders = ["*"])
-    @RequestMapping(method = [RequestMethod.GET], headers = ["Accept=*/*"])
+    @RequestMapping(method = [RequestMethod.PUT], headers = ["Accept=*/*"])
     @ResponseBody
-    fun getWsdl(httpEntity: HttpEntity<String>): String? {
-       // println("body: " + httpEntity.body)
+    fun getWsdl(httpEntity: HttpEntity<String>): MutableList<String> {
+        println("body: " + httpEntity.body)
         var body = httpEntity.body.toString()
 
         return wsdlService.returnOperations(body)
     }
 
-
-    @RequestMapping(value = ["/chooseOperation/{operation}"], method = [RequestMethod.GET], headers = ["Accept=*/*"])
+    @CrossOrigin(origins = ["http://localhost:3000"], allowedHeaders = ["*"])
+    @RequestMapping(value = ["/chooseOperation/{operation}"], method = [RequestMethod.PUT], headers = ["Accept=*/*"])
     @ResponseBody
     fun getOperationTarget(@PathVariable("operation") operation: String): String? {
 
