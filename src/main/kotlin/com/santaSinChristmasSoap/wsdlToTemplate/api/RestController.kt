@@ -14,17 +14,17 @@ class RestController(
     val wsdlService: WsdlService
 ) {
 
-    @CrossOrigin(origins = ["http://localhost:3000"], allowedHeaders = ["*"])
+    @CrossOrigin(origins = ["http://localhost:5000"], allowedHeaders = ["*"])
     @RequestMapping(method = [RequestMethod.PUT], headers = ["Accept=*/*"])
     @ResponseBody
     fun getWsdl(httpEntity: HttpEntity<String>): MutableList<String> {
         println("body: " + httpEntity.body)
-        var body = httpEntity.body.toString()
+        val body = httpEntity.body.toString()
 
         return wsdlService.returnOperations(body)
     }
 
-    @CrossOrigin(origins = ["http://localhost:3000"], allowedHeaders = ["*"])
+    @CrossOrigin(origins = ["http://localhost:5000"], allowedHeaders = ["*"])
     @RequestMapping(value = ["/chooseOperation/{operation}"], method = [RequestMethod.PUT], headers = ["Accept=*/*"])
     @ResponseBody
     fun getOperationTarget(@PathVariable("operation") operation: String): String? {
