@@ -35,10 +35,3 @@
     text-transform: uppercase;
     box-shadow: 0 4px 2px black;
 }
-
-body {
-  min-height: 100vh;
-  display: grid;
-  grid-gap: 2rem;
-  padding: 1rem;
-}

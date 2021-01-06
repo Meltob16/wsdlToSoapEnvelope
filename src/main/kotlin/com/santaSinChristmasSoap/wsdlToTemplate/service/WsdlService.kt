@@ -34,11 +34,11 @@ class WsdlService {
         wsdlInput = wsdl
 
         endpoints = createDistinctListFromRegexPattern("<wsdl:operation.* name=\"(.*?)\">", 1).toMutableList()
-//        var responseObject = JSONObject()
-//        endpoints.forEachIndexed { index, element ->
-//            responseObject[index.toString()] = element
-//        }
-//        println(responseObject)
+        var responseObject = JSONObject()
+        endpoints.forEachIndexed { index, element ->
+            responseObject[index.toString()] = element
+        }
+        println(responseObject)
         return endpoints
     }
 

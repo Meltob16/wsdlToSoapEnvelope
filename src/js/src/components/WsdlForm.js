@@ -30,6 +30,8 @@ export class WsdlForm extends Component {
     handleSubmit(event) {
         event.preventDefault();
 
+        const axios = require('axios');
+
         axios
             .put(
                 "http://localhost:8080/wsdlToTemplate",
@@ -50,6 +52,8 @@ export class WsdlForm extends Component {
 
         event.preventDefault();
 
+        const axios = require('axios');
+
         axios
             .put(
                 "http://localhost:8080/wsdlToTemplate/chooseOperation/"+operation,
@@ -64,7 +68,9 @@ export class WsdlForm extends Component {
     }
 
 
-    render() {     
+    render() {
+        const {responses} = this.state.response;
+        
         return (
             <div>
         <form onSubmit={this.handleSubmit}>
@@ -83,11 +89,15 @@ export class WsdlForm extends Component {
                 <label for={response}>{response}:</label>
             </div>
           ))}
-          <br/>
             <input type="submit" value="Submit Operation + WSDL" className="button"></input>
         </form>
         <br/>
         <textarea value={this.state.template} rows="12" cols="100" onChange={this.handleChange}/>
+{
+        this.state.response.length > 0 ? 
+        "hei" :
+        ""
+}
         </div>
         );
     }
