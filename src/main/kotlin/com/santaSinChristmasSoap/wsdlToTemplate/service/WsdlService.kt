@@ -30,16 +30,16 @@ class WsdlService {
         return soapEnvelope
     }
 
-    fun returnOperations(wsdl: String): MutableList<String> {
+    fun returnOperations(wsdl: String):String {
         wsdlInput = wsdl
 
         endpoints = createDistinctListFromRegexPattern("<wsdl:operation.* name=\"(.*?)\">", 1).toMutableList()
-//        var responseObject = JSONObject()
-//        endpoints.forEachIndexed { index, element ->
-//            responseObject[index.toString()] = element
-//        }
-//        println(responseObject)
-        return endpoints
+        var responseObject = JSONObject()
+        endpoints.forEachIndexed { index, element ->
+            responseObject[index.toString()] = element
+        }
+        println(responseObject)
+        return responseObject.toString()
     }
 
     fun removeIrrelevantInformation() {
@@ -125,7 +125,7 @@ class WsdlService {
     }
 
     fun createOpeningString() {
-        var openingString = """<xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:wsc="http://edb.com/ws/WSCommon"""
+        var openingString = """<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:wsc="http://edb.com/ws/WSCommon"""
 
         val index = wsdlInput.indexOf("""xmlns="http://edb.com/ws/WSCommon""") + """xmlns="http://edb.com/ws/WSCommon""".length
         val quotationIndex = wsdlInput.indexOf("\"", index)
@@ -135,7 +135,7 @@ class WsdlService {
         openingUrns = createDistinctListFromRegexPattern("xmlns:sch[0-9]=\"(.*?)[\"]", 1)
 
         openingUrns.forEachIndexed { index, element ->
-            openingString += " xlmns:urn$index=\"$element\"" //TODO match sch number with urn number
+            openingString += " xmlns:urn$index=\"$element\""
         }
         openingString += ">\n<soapenv:Header>"
 
