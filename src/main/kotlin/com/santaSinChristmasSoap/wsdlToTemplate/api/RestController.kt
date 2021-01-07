@@ -17,7 +17,7 @@ class RestController(
     @CrossOrigin(origins = ["http://localhost:3000"], allowedHeaders = ["*"])
     @RequestMapping(method = [RequestMethod.PUT], headers = ["Accept=*/*"])
     @ResponseBody
-    fun getWsdl(httpEntity: HttpEntity<String>): MutableList<String> {
+    fun getWsdl(httpEntity: HttpEntity<String>): String {
         println("body: " + httpEntity.body)
         var body = httpEntity.body.toString()
 

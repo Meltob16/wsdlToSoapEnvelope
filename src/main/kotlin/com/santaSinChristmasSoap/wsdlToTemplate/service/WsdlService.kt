@@ -30,7 +30,9 @@ class WsdlService {
         return soapEnvelope
     }
 
-    fun returnOperations(wsdl: String): MutableList<String> {
+    fun returnOperations(wsdl: String): String {
+        //TODO reset method
+        soapEnvelope = ""
         wsdlInput = wsdl
 
         endpoints = createDistinctListFromRegexPattern("<wsdl:operation.* name=\"(.*?)\">", 1).toMutableList()
@@ -39,7 +41,7 @@ class WsdlService {
             responseObject[index.toString()] = element
         }
         println(responseObject)
-        return endpoints
+        return responseObject.toString()
     }
 
     fun removeIrrelevantInformation() {
@@ -64,7 +66,7 @@ class WsdlService {
         complexTypes.addAll(getContentOfTag("<xsd:complexType", "</xsd:complexType"))
         complexTypes.addAll(getContentOfTag("<complexType", "</complexType"))
         messagesWithContent = getContentOfTag("<wsdl:message", "</wsdl:message>")
-        operationsWithContent = getContentOfTag("<wsdl:operation", "</wsdl:operation>")
+        operationsWithContent = getContentOfTag("<wsdl:operation", "</wsdl:operation>") // <wsdl:operation />
         createListOfComplexTypeNames()
         createListOfSimpleTypeNames()
 
@@ -143,62 +145,51 @@ class WsdlService {
         createMapOfSchemasWithNamespace()
     }
 
-    fun createSoapEnvelopeFromComplexType(complexType: String) {
-        val startIndex = wsdlInput.indexOf("<xsd:complexType name=$complexType")
-        val endIndex = wsdlInput.indexOf("</xsd:complexType>")
-    }
-
     fun getContentOfTag(startTag: String, endTag: String, name: String = ""): MutableList<String> {
         var tempList: MutableList<String> = mutableListOf()
 
         var tempString = wsdlInput
         var numberOfOpenTags = 0
-        var previousStartTagIndex = tempString.indexOf(startTag)
-        var previousEndTagIndex = tempString.indexOf(endTag)
 
         while (tempString.contains(endTag)) {
-            previousStartTagIndex = tempString.indexOf(startTag)
-            previousEndTagIndex = tempString.indexOf(endTag)
+            var previousStartTagIndex = tempString.indexOf(startTag)
+            var previousEndTagIndex = tempString.indexOf(endTag)
 
+            if (tempList.size == 56) {
+                println("fdgs")
+            }
             // only one open case
             if (tempString.indexOf(startTag, previousStartTagIndex + 1) > previousEndTagIndex || (tempString.indexOf(startTag, previousStartTagIndex + 1) == -1)) {
-                val complexType = tempString.substring(tempString.indexOf(startTag), tempString.indexOf(endTag, previousEndTagIndex) + endTag.length)
+
+                val complexType = tempString.substring(tempString.indexOf(startTag), tempString.indexOf(endTag, previousEndTagIndex) + endTag.length + 1)
                 tempList.add(complexType)
                 tempString = tempString.replace(complexType, "") // cut out complexType string
             }
 
             // more than one open case
             else if (nextOpenIsBeforeClose(tempString, startTag, previousStartTagIndex, previousEndTagIndex)) {
-                while ((tempString.indexOf(startTag, previousStartTagIndex + 1) != -1) and (nextOpenIsBeforeClose(tempString, startTag, previousStartTagIndex, previousEndTagIndex))) {
-                    numberOfOpenTags++
-                    previousStartTagIndex = tempString.indexOf(startTag, previousStartTagIndex + 1)
-                }
-                while (numberOfOpenTags != 0) {
-                    numberOfOpenTags--
-                    previousEndTagIndex = tempString.indexOf(endTag, previousEndTagIndex + 1)
-                }
+                var hasSeveralOpen = true
 
-                val complexType = tempString.substring(tempString.indexOf(startTag), tempString.indexOf(endTag, previousEndTagIndex) + endTag.length + 1)
-                tempList.add(complexType)
-                tempString = tempString.replace(complexType, "")
+                while (hasSeveralOpen) {
+                    if((tempString.indexOf(startTag, previousStartTagIndex + 1) != -1) and (nextOpenIsBeforeClose(tempString, startTag, previousStartTagIndex, previousEndTagIndex))) {
+                        numberOfOpenTags++
+                        previousStartTagIndex = tempString.indexOf(startTag, previousStartTagIndex + 1)
+                    }
+                    if ((numberOfOpenTags != 0) && (!nextOpenIsBeforeClose(tempString, startTag, previousStartTagIndex, previousEndTagIndex))) {
+                        numberOfOpenTags--
+                        previousEndTagIndex = tempString.indexOf(endTag, previousEndTagIndex + 1)
+                    }
+                    if (numberOfOpenTags == 0) {
+                        val complexType = tempString.substring(tempString.indexOf(startTag), tempString.indexOf(endTag, previousEndTagIndex) + endTag.length + 1)
+                        tempList.add(complexType)
+                        tempString = tempString.replace(complexType, "")
+                        hasSeveralOpen = false
+                    }
+                }
             }
-//            val endTagIndex = tempString.indexOf(endTag) + endTag.length
-//
-//            if (tempString.contains(startTag)) {
-//                mergePoint = tempString.indexOf(startTag)
-//                val startWsdl = tempString.substring(0, tempString.indexOf(startTag))
-//                val endWsdl = tempString.substring(endTagIndex, tempString.length)
-//                tempString = startWsdl + endWsdl
-//
-//            }
-//
-//            if ((tempString.indexOf(startTag) == -1) && (tempString.indexOf(endTag) > -1)) {
-//                val startWsdl = tempString.substring(0, mergePoint)
-//                val endWsdl = tempString.substring(tempString.indexOf(endTag) + endTag.length, tempString.length)
-//                tempString = startWsdl + endWsdl
-//            }
-            //}
         }
+        println("here we go" +tempString)
+        println(".....................................:.......................................................................................................")
         return tempList
     }
 
@@ -243,11 +234,11 @@ class WsdlService {
                 .distinct()
     }
 
-    fun createMapFromRegexPattern(startPattern: String, complexTypeText: String?, grouOne: Int = 3, groupTwo: Int = 4): Map<String, String> {
+    fun createMapFromRegexPattern(startPattern: String, complexTypeText: String?, groupOne: Int = 3, groupTwo: Int = 4): Map<String, String> {
         val regex = Regex(startPattern)
         return regex.findAll(complexTypeText ?: "")
                 .toList()
-                .map { it.groupValues[grouOne] to it.groupValues[groupTwo] }
+                .map { it.groupValues[groupOne] to it.groupValues[groupTwo] }
                 .toMap()
     }
 
@@ -268,7 +259,7 @@ class WsdlService {
             complexTypeText = complexTypes.find { it.contains(searchWord) }
         }
 
-        var mapOfNameAndType = createMapFromRegexPattern("<(xsd|xs):(element|attribute).* name=\"(.*?)\".* type=\"(.*?)\"", complexTypeText).toMutableMap()
+        var mapOfNameAndType = createMapFromRegexPattern("<(xsd|xs):(element|attribute).* name=\"(.*?)\".* type=\"(.*?)\"", complexTypeText).toMutableMap() // TODO change xs/xsd to (.*?) ish
         mapOfNameAndType.putAll(createMapFromRegexPattern("<(element|attribute).* name=\"(.*?)\".* type=\"(.*?)\"", complexTypeText, 2, 3))
 
         val libSearch = Regex("<(xsd|xs):(element|attribute).* name=\"(.*?)\".* type=\"(.*?)\"")
