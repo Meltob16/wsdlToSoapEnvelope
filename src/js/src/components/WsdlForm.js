@@ -1,6 +1,5 @@
 import {Component} from 'react';
 import axios from 'axios';
-import qs from 'qs';
 
 export class WsdlForm extends Component {
 
@@ -30,8 +29,6 @@ export class WsdlForm extends Component {
     handleSubmit(event) {
         event.preventDefault();
 
-        const axios = require('axios');
-
         axios
             .put(
                 "http://localhost:8080/wsdlToTemplate",
@@ -48,11 +45,7 @@ export class WsdlForm extends Component {
     handleOperationSubmit(event) {
         let operation = this.state.operation;
 
-        console.log(operation);
-
         event.preventDefault();
-
-        const axios = require('axios');
 
         axios
             .put(
@@ -69,8 +62,7 @@ export class WsdlForm extends Component {
 
 
     render() {
-        const {responses} = this.state.response;
-        
+    
         return (
             <div>
         <form onSubmit={this.handleSubmit}>
@@ -81,23 +73,22 @@ export class WsdlForm extends Component {
             <input type="submit" value="Submit WSDL" className="button"/>
         </form>
         <br/>
+        <br/>
 
         <form onSubmit={this.handleOperationSubmit}>
           {this.state.response.map(response => (
             <div>
                 <input type="radio" id={response} name="operations" value={response} onChange={this.handleRadioChange} />
-                <label for={response}>{response}:</label>
+                <label for={response}>{response}</label>
             </div>
           ))}
+          <br/>
             <input type="submit" value="Submit Operation + WSDL" className="button"></input>
+
         </form>
         <br/>
         <textarea value={this.state.template} rows="12" cols="100" onChange={this.handleChange}/>
-{
-        this.state.response.length > 0 ? 
-        "hei" :
-        ""
-}
+
         </div>
         );
     }

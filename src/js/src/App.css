@@ -1,37 +1,50 @@
 
+.button{
+  z-index: 3;
+  background: linear-gradient(#5D2B96, #0500cc);
+  color: white;
+  padding: 0.5em 3.5em 0.5em 3.5em;
+  border: 1px solid #BE5AFC;
+  text-align: center;
+  transition: 0.5s;
+  text-decoration: none;
+  font-family: 'Titillium Web', sans-serif;
+  text-transform: uppercase;
+  box-shadow: 0 4px 2px black;
+}
 
-  .button{
-    z-index: 3;
-    background: linear-gradient(#5D2B96, #0500cc);
-    color: white;
-    padding: 0.5em 3.5em 0.5em 3.5em;
-    border: 1px solid #BE5AFC;
-    text-align: center;
-    transition: 0.5s;
-    text-decoration: none;
-    font-family: 'Titillium Web', sans-serif;
-    text-transform: uppercase;
-    box-shadow: 0 4px 2px black;
-  }
-  
-  .button:hover {
-    transform: scale3d(1.2, 1.2, 1.2);
-    box-shadow: 40px 40px 8px 0 rgba(0, 0, 0, 0.2);
-    filter: brightness(130%);
-    z-index: 5;
-  }
+.button:hover {
+  transform: scale3d(1.2, 1.2, 1.2);
+  box-shadow: 40px 40px 8px 0 rgba(0, 0, 0, 0.2);
+  filter: brightness(130%);
+  z-index: 5;
+}
 
-  .button:active {
-    transform: scale3d(1, 1, 1);
-    z-index: 3;
-    background: linear-gradient(#5D2B96, #0500cc);
-    color: white;
-    padding: 0.5em 3.5em 0.5em 3.5em;
-    border: 1px solid #BE5AFC;
-    text-align: center;
-    transition: 0.1s;
-    text-decoration: none;
-    font-family: 'Titillium Web', sans-serif;
-    text-transform: uppercase;
-    box-shadow: 0 4px 2px black;
+.button:active {
+  transform: scale3d(1, 1, 1);
+  z-index: 3;
+  background: linear-gradient(#5D2B96, #0500cc);
+  color: white;
+  padding: 0.5em 3.5em 0.5em 3.5em;
+  border: 1px solid #BE5AFC;
+  text-align: center;
+  transition: 0.1s;
+  text-decoration: none;
+  font-family: 'Titillium Web', sans-serif;
+  text-transform: uppercase;
+  box-shadow: 0 4px 2px black;
+}
+
+body {
+  min-height: 100vh;
+  display: grid;
+  justify-content: center;
+  grid-gap: 2rem;
+  padding: 1rem;
+}
+
+.radio {
+  font-size: 1.2rem;
+  color: #401c69;
+  display: grid;
 }
