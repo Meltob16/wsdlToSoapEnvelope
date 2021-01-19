@@ -14,8 +14,8 @@ class RestController(
     val wsdlService: WsdlService
 ) {
 
-    @CrossOrigin(origins = ["http://localhost:3000"], allowedHeaders = ["*"])
-    @RequestMapping(method = [RequestMethod.PUT], headers = ["Accept=*/*"])
+    @CrossOrigin(origins = ["http://localhost:8080"], allowedHeaders = ["*"])
+    @RequestMapping(method = [RequestMethod.GET], headers = ["Accept=*/*"])
     @ResponseBody
     fun getWsdl(httpEntity: HttpEntity<String>): String {
         println("body: " + httpEntity.body)
@@ -24,13 +24,12 @@ class RestController(
         return wsdlService.returnOperations(body)
     }
 
-    @CrossOrigin(origins = ["http://localhost:3000"], allowedHeaders = ["*"])
-    @RequestMapping(value = ["/chooseOperation/{operation}"], method = [RequestMethod.PUT], headers = ["Accept=*/*"])
+    @CrossOrigin(origins = ["http://localhost:8080"], allowedHeaders = ["*"])
+    @RequestMapping(value = ["/chooseOperation/{operation}"], method = [RequestMethod.GET], headers = ["Accept=*/*"])
     @ResponseBody
     fun getOperationTarget(@PathVariable("operation") operation: String): String? {
 
 
         return wsdlService.operationToSoapTemplate(operation)
     }
-
 }
