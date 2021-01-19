@@ -17,6 +17,7 @@
 	<properties>
 		<java.version>11</java.version>
 		<kotlin.version>1.4.21</kotlin.version>
+		<packaging>jar</packaging>
 	</properties>
 
 	<dependencies>
@@ -92,5 +93,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
 </project>
